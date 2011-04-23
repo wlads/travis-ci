@@ -5,6 +5,14 @@ class RepositoriesController < ApplicationController
     render :json => repositories.as_json
   end
 
+  def watched
+    if user_signed_in?
+      render :json => Octokit.watched(current_user.login)
+    else
+      render :json => [] # TODO: return something sane
+    end
+  end
+
   def show
     respond_to do |format|
       format.json do

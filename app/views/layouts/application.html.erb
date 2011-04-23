@@ -64,10 +64,12 @@
           <h5><a href="#">Recent</a></h5>
           <div class="tab"></div>
         </li>
-        <li id="tab_watched">
-          <h5><a class="tool-tip" title="Not yet implemented. We could use your help!">Watched</a></h5>
-          <div class="tab"></div>
-        </li>
+        <% if user_signed_in? %>
+          <li id="tab_watched">
+            <h5><a href="#!/<%= current_user.login %>/watched">Watched</a></h5>
+            <div class="tab"></div>
+          </li>
+        <% end %>
       </ul>
     </div>
 

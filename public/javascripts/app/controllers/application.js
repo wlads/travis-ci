@@ -2,12 +2,13 @@ Travis.Controllers.Application = Backbone.Controller.extend({
   routes: {
     '':                          'recent',
     // '!/:owner':               'byOwner',
+    '!/:owner/watched':          'watched',
     '!/:owner/:name':            'repository',
     '!/:owner/:name/builds':     'repositoryHistory',
     '!/:owner/:name/builds/:id': 'repositoryBuild',
   },
   initialize: function() {
-    _.bindAll(this, 'recent', 'byUser', 'repository', 'repositoryHistory', 'repositoryBuild', 'repositoryShow', 'repositorySelected',
+    _.bindAll(this, 'recent', 'watched', 'byUser', 'repository', 'repositoryHistory', 'repositoryBuild', 'repositoryShow', 'repositorySelected',
       'buildQueued', 'buildStarted', 'buildLogged', 'buildFinished');
   },
   run: function() {
@@ -43,6 +44,13 @@ Travis.Controllers.Application = Backbone.Controller.extend({
   // actions
 
   recent: function() {
+    this.reset();
+    this.tab = 'current';
+    this.followBuilds = true;
+    this.repositories.whenFetched(this.repositories.selectLast);
+    this.selectTab();
+  },
+  watched: function() {
     this.reset();
     this.tab = 'current';
     this.followBuilds = true;

@@ -17,8 +17,13 @@ gem 'resque-meta',         '~> 1.0.3'
 gem 'travis-ci-em-pusher', '~> 0.1.1'
 gem 'unobtrusive_flash',   '~> 0.0.2'
 gem 'yajl-ruby',           '~> 0.8.2'
+gem 'octokit'
 
 gem 'rails_admin', :git => 'git://github.com/sferik/rails_admin.git', :ref => 'b9c50a44a1e21840b265'
+
+group :development do
+  gem 'unicorn', :require => false
+end
 
 group :test do
   # gem 'steam', :path => '~/Development/projects/steam'
