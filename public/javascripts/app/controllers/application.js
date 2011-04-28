@@ -2,7 +2,6 @@ Travis.Controllers.Application = Backbone.Controller.extend({
   routes: {
     '':                          'recent',
     // '!/:owner':               'byOwner',
-    '!/:owner/watched':          'watched',
     '!/:owner/:name':            'repository',
     '!/:owner/:name/builds':     'repositoryHistory',
     '!/:owner/:name/builds/:id': 'repositoryBuild',
@@ -44,13 +43,6 @@ Travis.Controllers.Application = Backbone.Controller.extend({
   // actions
 
   recent: function() {
-    this.reset();
-    this.tab = 'current';
-    this.followBuilds = true;
-    this.repositories.whenFetched(this.repositories.selectLast);
-    this.selectTab();
-  },
-  watched: function() {
     this.reset();
     this.tab = 'current';
     this.followBuilds = true;

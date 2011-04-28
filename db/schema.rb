@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110414131100) do
+ActiveRecord::Schema.define(:version => 20110426071204) do
 
   create_table "builds", :force => true do |t|
     t.integer  "repository_id"
@@ -82,7 +82,8 @@ ActiveRecord::Schema.define(:version => 20110414131100) do
     t.string   "email"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "is_admin",   :default => false
+    t.boolean  "is_admin",             :default => false
+    t.text     "watched_repositories"
   end
 
   add_index "users", ["login"], :name => "index_users_on_login", :unique => true

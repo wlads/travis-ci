@@ -5,6 +5,8 @@ class User < ActiveRecord::Base
 
   attr_accessible :name, :login, :email
 
+  serialize :watched_repositories, Array
+
   after_create :create_a_token
 
   def self.find_for_github_oauth(user_hash)
@@ -18,6 +20,21 @@ class User < ActiveRecord::Base
 
   def profile_image_hash
     self.email? ? Digest::MD5.hexdigest(self.email) : '00000000000000000000000000000000'
+  end
+
+  def watched_repositories
+    super || []
+  end
+
+  def watched
+    reload_watched_repositories! if self.watched_repositories.empty?
+
+    Repository.where(:slug => watched_repositories.map { |r| "#{r['owner']}/#{r['name']}" })
+  end
+
+  def reload_watched_repositories!
+    self.watched_repositories = Octokit.watched(self.login).map { |r| r.slice(:name, :owner).to_hash }
+    save
   end
 
   private

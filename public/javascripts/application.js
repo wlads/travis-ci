@@ -66,6 +66,20 @@ $(document).ready(function() {
       }
     });
   });
+
+  $('#tab_watched a').click(function(e) {
+    e.preventDefault();
+
+    $.ajax({
+      type: "GET",
+      url: "/repositories/watched",
+      success: function(repositories) {
+        $('#tab_recent').removeClass('active');
+        $('#tab_watched').addClass('active');
+        Travis.app.repositories.refresh(repositories);
+      }
+    });
+  });
 });
 
 if (window.console) {

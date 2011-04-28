@@ -7,7 +7,7 @@ class RepositoriesController < ApplicationController
 
   def watched
     if user_signed_in?
-      render :json => Octokit.watched(current_user.login)
+      render :json => current_user.watched.as_json
     else
       render :json => [] # TODO: return something sane
     end

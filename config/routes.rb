@@ -11,6 +11,7 @@ TravisCi::Application.routes.draw do
 
   resources :repositories do
     resources :builds
+    get :watched, :on => :collection
   end
 
   resources :builds do
