@@ -894,12 +894,14 @@
     Backbone.Controller.extend = Backbone.View.extend = extend;
 
   // Map from CRUD to HTTP for our default `Backbone.sync` implementation.
-  var methodMap = {
+  Backbone.methodMap = {
     'create': 'POST',
     'update': 'PUT',
     'delete': 'DELETE',
     'read'  : 'GET'
   };
+
+  var methodMap = Backbone.methodMap;
 
   // Backbone.sync
   // -------------
@@ -1003,10 +1005,12 @@
 
   // Helper function to get a URL from a Model or Collection as a property
   // or as a function.
-  var getUrl = function(object) {
+  Backbone.getUrl = function(object) {
     if (!(object && object.url)) return null;
     return _.isFunction(object.url) ? object.url() : object.url;
   };
+
+  var getUrl = Backbone.getUrl;
 
   // Throw an error when a URL is needed, and none is supplied.
   var urlError = function() {
@@ -1014,7 +1018,7 @@
   };
 
   // Wrap an optional error callback with a fallback error event.
-  var wrapError = function(onError, model, options) {
+  Backbone.wrapError = function(onError, model, options) {
     return function(resp) {
       if (onError) {
         onError(model, resp);
@@ -1023,6 +1027,8 @@
       }
     };
   };
+
+  var wrapError = Backbone.wrapError;
 
   // Helper function to escape a string for HTML rendering.
   var escapeHTML = function(string) {
