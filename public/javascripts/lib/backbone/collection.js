@@ -3,22 +3,34 @@ Travis.Collections.Base = Backbone.Collection.extend({
   fetching: false,
   initialize: function() {
     Backbone.Collection.prototype.initialize.apply(this, arguments);
-    _.bindAll(this, 'whenFetched', 'select', 'selectLast', 'selectLastBy', 'deselect', 'getOrFetchLast', 'getOrFetchLastBy', 'getBy');
+    _.bindAll(this, 'whenFetched', 'select', 'selectLast', 'selectLastBy', 'deselect', 'getOrFetchLast', 'getOrFetchLastBy', 'getBy', 'synchronousFetch', 'getOrFetch');
   },
   fetch: function(options) {
-    options = options || {};
+    options || (options = {});
     var collection = this;
     this.startFetching();
-    return Backbone.Collection.prototype.fetch.call(this, {
-      success: function() {
-        if(options.success) options.success.apply(this, arguments);
-        collection.finishFetching();
-      }.bind(this),
-      error: function(e) {
-        if(options.error) options.error.apply(this, arguments);
-        collection.finishFetching();
-      }.bind(this)
-    });
+    var success = function(resp) {
+      collection[options.add ? 'add' : 'refresh'](collection.parse(resp));
+      if (options.success) options.success(collection, resp);
+    };
+    var error = Backbone.wrapError(options.error, collection, options);
+    (this.sync || Travis.sync)('read', this, success, error, options);
+    this.finishFetching();
+    return this;
+
+    // options = options || {};
+    // var collection = this;
+    // this.startFetching();
+    // return Backbone.Collection.prototype.fetch.call(this, {
+    //   success: function() {
+    //     if(options.success) options.success.apply(this, arguments);
+    //     collection.finishFetching();
+    //   }.bind(this),
+    //   error: function(e) {
+    //     if(options.error) options.error.apply(this, arguments);
+    //     collection.finishFetching();
+    //   }.bind(this)
+    // });
   },
   whenFetched: function(callback, options) {
     if(!this.fetched || this.fetching) {
@@ -58,13 +70,26 @@ Travis.Collections.Base = Backbone.Collection.extend({
     if(element) {
       callback(element);
     } else {
-      var model = new Travis.Models.Repository(options, { collection: this });
-      model.fetch({ success: function(model) {
-        callback(model);
-        this.add(model, { silent: true })
-        model.collection.trigger('select', model)
-      }.bind(this) });
+      // var model = new this.model(options, { collection: this });
+      var model = this.synchronousFetch(options)
+      callback(model);
+      this.add(model, { silent: true })
+      model.collection.trigger('select', model)
+
+      // model.fetch({ success: function(model) {
+      //   callback(model);
+      //   this.add(model, { silent: true })
+      //   model.collection.trigger('select', model)
+      // }.bind(this) });
     }
+  },
+  synchronousFetchById: function(id) {
+    return this.synchronousFetch({ id: id })
+  },
+  synchronousFetch: function(options) {
+    var model = new this.model(options, { collection: this })
+    model.fetch({ async: false })
+    return model
   },
   getBy: function(options) {
     return this.detect(function(element) {
@@ -75,28 +100,18 @@ Travis.Collections.Base = Backbone.Collection.extend({
     var element = this.get(id);
     if(element) {
       callback(element);
-      this.trigger('finish_get_or_fetch');
     } else {
-      var model = new this.model({ id: id, collection: this });
-      model.fetch({
-        success: function(model) {
-          var model = new this.model(model.attributes, { collection: this });
-          if(model.get('parent_id')) {
-            this.getOrFetch(model.get('parent_id'), function(parent) {
-              callback(parent.matrix.get(id));
-            });
-          } else {
-            this.add(model, { silent: true });
-            callback(model);
-          }
-          this.trigger('finish_get_or_fetch');
-        }.bind(this),
-        error: function() {
-          // console.log('could not retrieve model:')
-          // console.log(arguments);
-        }
-      });
+      var model = this.synchronousFetchById(id);
+      if(model.get('parent_id')) {
+        this.getOrFetch(model.get('parent_id'), function(parent) {
+          callback(parent.matrix.get(id));
+        });
+      } else {
+        this.add(model, { silent: true });
+        callback(model);
+      }
     }
+    this.trigger('finish_get_or_fetch');
   },
   startFetching: function() {
     this.fetching = true;

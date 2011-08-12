@@ -11,8 +11,7 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     '!/:owner/:name/builds/:id':                 'repositoryBuild',
   },
   initialize: function() {
-    _.bindAll(this, 'recent', 'byUser', 'repository', 'repositoryHistory', 'repositoryBuild', 'repositoryShow', 'repositorySelected',
-              'buildQueued', 'buildStarted', 'buildLogged', 'buildFinished', 'buildRemoved');
+    _.bindAll(this, 'recent', 'byUser', 'repository', 'repositoryHistory', 'repositoryBuild', 'repositoryShow', 'repositorySelected', 'buildQueued', 'buildStarted', 'buildLogged', 'buildFinished', 'buildRemoved');
   },
 
   run: function() {
@@ -56,10 +55,7 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     this.reset();
     this.followBuilds = true;
     this.selectTab('current');
-    this.repositories.whenFetched(_.bind(function () {
-      this.repositories.selectLast();
-
-    }, this));
+    this.repositories.selectLast();
   },
   repository: function(owner, name, line_number) {
     console.log ("application#repository: ", arguments)
@@ -70,7 +66,6 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     this.selectTab('current');
     this.repositories.whenFetched(_.bind(function(repositories) {
       repositories.selectLastBy({ slug: owner + '/' + name });
-
     }, this));
   },
   repositoryHistory: function(owner, name) {
