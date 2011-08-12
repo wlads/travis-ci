@@ -24,16 +24,18 @@ var Travis = {
 
 $(document).ready(function() {
   if(!window.__TESTING__ && $('#home').length == 1) {
-
     Travis.start();
     Backbone.history.start();
 
     var channels = ['repositories', 'jobs'];
+    // Actually, channel separation s dead simple. We simply subscribe to nothing here and whenever the repository is activated (show.js), we start tracking channel with repository name by slug.
     _.each(channels, function(channel) { pusher.subscribe(channel).bind_all(Travis.receive); })
   } else {
+    console.log(123)
     Travis.templates = JST;
   }
 
+  // TODO: FIXME: that could (and should) be done through CSS, no need to use JS for that
   $('#top .profile').mouseover(function() { $('#top .profile ul').show(); });
   $('#top .profile').mouseout(function() { $('#top .profile ul').hide(); });
 
@@ -56,6 +58,7 @@ $(document).ready(function() {
     });
   }
 
+  // TODO: FIXME: refactor that horrible disaster.
   $('#search input').keyup(_.debounce(function(e) {
     Travis.app.repositories.setFilter($(this).val()).fetch()
   }, 100));
@@ -64,13 +67,10 @@ $(document).ready(function() {
     $("#right").toggleClass('minimized');
     $('#main').toggleClass('large');
     $('.slider').toggleClass('toggled');
+    console.log(123)
   }
 
-  if($.cookie('slider_hidden') === 'false') {
-    toggle_slider();
-  }
   $(".slider").click(function() {
-    $.cookie('slider_hidden', !($.cookie('slider_hidden') === 'true'));
     toggle_slider();
   });
 
@@ -96,35 +96,7 @@ if(!Function.prototype.bind) {
 // [1]: http://stackoverflow.com/questions/1013637/unexpected-caching-of-ajax-results-in-ie8
 $.ajaxSetup({ cache: false });
 
-// jQuery(document).ready(function($){
-//   $.each($('.post.link.github h3 a'), function() {
-//     var post = $(this).parents(".post");
-//     var url = $(this).attr('href');
-//     var segments = url.split('/');
-//     var repo = segments.pop();
-//     var username = segments.pop();
-//     $.getJSON("http://github.com/api/v2/json/repos/show/"+username+"/"+repo+"?callback=?", function(data){
-//       var repo_data = data.repository;
-//       if(repo_data) {
-//         var watchers_link = $('<a>').addClass('watchers').attr('href', url+'/watchers').text(repo_data.watchers);
-//         var forks_link = $('<a>').addClass('forks').attr('href', url+'/network').text(repo_data.forks);
-//         var comment_link = post.find('.meta .comment-count');
-//         comment_link.after(watchers_link);
-//         comment_link.after(forks_link);
-//       }
-//     });
-//   });
-// });
-//
-
-// Overriden Backbone.methods for overriden fetch/sync methods
 (function(){
-  Backbone.methodMap = {
-    'create': 'POST',
-    'update': 'PUT',
-    'delete': 'DELETE',
-    'read'  : 'GET'
-  };
   Travis.DISPLAYED_KEYS = [ 'rvm', 'gemfile', 'env' ]
   function CSRFProtection (xhr) {
     var token = $('meta[name="csrf-token"]').attr('content');
