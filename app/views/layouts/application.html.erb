@@ -10,19 +10,6 @@
     <meta name="csrf-token" content="<%= form_authenticity_token %>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="/favicon.ico">
-    <% if Rails.env.jasmine? %>
-      <%= stylesheet_link_tag 'jasmine' %>
-      <%= include_javascripts :jasmine %>
-    <% end %>
-    <%= stylesheet_link_tag 'application', 'jquery.tipsy.css' %>
-
-    <%= include_javascripts :travis %>
-    <%= include_javascripts :templates %>
-
-    <% if Rails.env.test? %>
-      <%= include_javascripts :capybara %>
-    <% end %>
-    <%= javascript_tag "var env = '#{Rails.env}';" %>
   </head>
 
   <body id="<%= body_id %>">
@@ -68,8 +55,22 @@
 
     <div id="flash-messages"></div>
 
-    <%= javascript_tag "var pusher = new Pusher('#{Pusher.key}');" unless Rails.env.jasmine? %>
+    <!-- JavaScript at the bottom for fast page loading -->
+    <% if Rails.env.jasmine? %>
+      <%= stylesheet_link_tag 'jasmine' %>
+      <%= include_javascripts :jasmine %>
+    <% end %>
+    <%= stylesheet_link_tag 'application', 'jquery.tipsy.css' %>
 
+    <%= include_javascripts :travis %>
+    <%= include_javascripts :templates %>
+
+    <% if Rails.env.test? %>
+      <%= include_javascripts :capybara %>
+    <% end %>
+    <%= javascript_tag "var env = '#{Rails.env}';" %>
+    <%= javascript_tag "var pusher = new Pusher('#{Pusher.key}');" unless Rails.env.jasmine? %>
     <%= render 'layouts/google_analytics' %>
+
   </body>
 </html>
