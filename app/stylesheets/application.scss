@@ -62,7 +62,6 @@ caption {
   z-index: 30;
   display: block;
   padding: 60px 300px 30px 440px;
-  @include transition(padding .5s ease-out);
   &.loading {
     opacity: .1;
     min-height: 1000px;
@@ -664,7 +663,6 @@ caption {
   background-color: #f2f4f9;
   border-bottom: 1px solid #ccc;
   overflow: visible;
-  @include transition(width .5s ease-out);
   &.maximized {
     width: 240px;
   };
