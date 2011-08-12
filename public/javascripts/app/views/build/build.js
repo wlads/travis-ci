@@ -4,26 +4,24 @@ Travis.Views.Build.Build = Backbone.View.extend({
     _.extend(this, this.options);
 
     this.el = $('<div></div>');
-    if(this.repository) {
-      this.render();
-      this.attachTo(this.repository);
-    }
   },
   render: function() {
-    if(this.repository) this._update();
+    this.model.builds.fetch({ async: false })
+    this.build = this.model.builds.first()
+    this._update();
     return this;
   },
   detach: function() {
-    if(this.repository) {
-      this.repository.builds.unbind('select', this.buildSelected);
-      delete this.repository;
+    if(this.model) {
+      this.model.builds.unbind('select', this.buildSelected);
+      delete this.model;
       delete this.build;
     }
   },
   attachTo: function(repository) {
     this.detach();
-    this.repository = repository;
-    this.repository.builds.bind('select', this.buildSelected);
+    this.model = repository;
+    this.model.builds.bind('select', this.buildSelected);
     this._update();
     this.updateTab();
   },
@@ -48,7 +46,7 @@ Travis.Views.Build.Build = Backbone.View.extend({
   },
   updateTab: function() {
     if(this.build) {
-      $('#tab_build h5 a').attr('href', '#!/' + this.repository.get('slug') + '/builds/' + this.build.id).html('Build ' + this.build.get('number'));
+      $('#tab_build h5 a').attr('href', '#!/' + this.model.get('slug') + '/builds/' + this.build.id).html('Build ' + this.build.get('number'));
       $('#tab_parent').hide();
       this.build.parent(function(parent) {
         $('#tab_parent').show().find('h5 a').attr('href', '#!/' + parent.repository.get('slug') + '/builds/' + parent.id).html('Build ' + parent.get('number'));

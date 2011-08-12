@@ -1,6 +1,6 @@
 Travis.Controllers.Application = Backbone.Controller.extend({
   routes: {
-    '':                                          'recent',
+    // '':                                          'recent',
     // '!/:owner':               'byOwner',
     // FIXME: I would suggest to use !/repositories/:owner/:name, to make it more rest-like.
     // Because, for instance, now we should put myRepositories on top so that it could get matched. Unambigous routes rule!
@@ -22,20 +22,20 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     this.workers      = new Travis.Collections.Workers();
 
     this.repositoriesList = new Travis.Views.Repositories.List();
-    this.repositoryShow   = new Travis.Views.Repository.Show({ parent: this });
+    // this.repositoryShow   = new Travis.Views.Repository.Show({ parent: this });
     this.workersView      = new Travis.Views.Workers.List();
     this.jobsView         = new Travis.Views.Jobs.List({ queue: 'builds' });
     this.jobsRailsView    = new Travis.Views.Jobs.List({ queue: 'rails' });
 
     $('#left #tab_recent .tab').append(this.repositoriesList.render().el);
-    $('#main').append(this.repositoryShow.render().el);
+    // $('#main').append(this.repositoryShow.render().el);
 
     this.repositoriesList.attachTo(this.repositories);
-    this.repositoryShow.attachTo(this.repositories)
+    // this.repositoryShow.attachTo(this.repositories)
     this.workersView.attachTo(this.workers)
     this.jobsView.attachTo(this.jobs)
     this.jobsRailsView.attachTo(this.jobsRails)
-    this.repositories.bind('select', this.repositorySelected);
+    // this.repositories.bind('select', this.repositorySelected);
 
     this.bind('build:started',    this.buildStarted);
     this.bind('build:finished',   this.buildFinished);
@@ -44,6 +44,9 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     this.bind('build:queued',     this.buildQueued);
     this.bind('build:removed',    this.buildRemoved); /* UNTESTED */
 
+    this.repositories.fetch({
+      success: this.recent
+    });
     this.workers.fetch();
     this.jobs.fetch();
     this.jobsRails.fetch();
@@ -55,7 +58,8 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     this.reset();
     this.followBuilds = true;
     this.selectTab('current');
-    this.repositories.selectLast();
+
+    $('#main').append(new Travis.Views.Repository.Show({ parent: this, model: this.repositories.last() }).render().el)
   },
   repository: function(owner, name, line_number) {
     console.log ("application#repository: ", arguments)
@@ -165,7 +169,7 @@ Travis.Controllers.Application = Backbone.Controller.extend({
 
   selectTab: function(tab) {
     this.tab = tab;
-    this.repositoryShow.activateTab(this.tab);
+    // this.repositoryShow.activateTab(this.tab);
   },
   addJob: function(data) {
     this.jobsCollection(data).add({ number: data.build.number, id: data.build.id, repository: { slug: data.slug } });
@@ -182,3 +186,9 @@ Travis.Controllers.Application = Backbone.Controller.extend({
 });
 
 
+function eventTest() {
+  _.delay(eventTest, 20);
+  console.log(1)
+}
+
+// eventTest()

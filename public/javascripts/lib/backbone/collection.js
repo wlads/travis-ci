@@ -7,7 +7,6 @@ Travis.Collections.Base = Backbone.Collection.extend({
   },
   fetch: function(options) {
     options || (options = {});
-
     var collection = this;
     this.startFetching();
     var success = function(resp) {
@@ -62,15 +61,9 @@ Travis.Collections.Base = Backbone.Collection.extend({
       callback(model);
       this.add(model, { silent: true })
       model.collection.trigger('select', model)
-
-      // model.fetch({ success: function(model) {
-      //   callback(model);
-      //   this.add(model, { silent: true })
-      //   model.collection.trigger('select', model)
-      // }.bind(this) });
     }
   },
-  synchronousfetchbyid: function(id) {
+  synchronousFetchById: function(id) {
     return this.synchronousFetch({ id: id })
   },
   synchronousFetch: function(options) {
