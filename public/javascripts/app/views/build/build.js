@@ -6,7 +6,7 @@ Travis.Views.Build.Build = Backbone.View.extend({
     this.el = $('<div></div>');
   },
   render: function() {
-    this.model.builds.fetch({ async: false })
+    this.model.builds.fetchSynchronosly()
     this.build = this.model.builds.first()
     this._update();
     return this;

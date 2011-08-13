@@ -1,6 +1,6 @@
 Travis.Controllers.Application = Backbone.Controller.extend({
   routes: {
-    // '':                                          'recent',
+    '':                                          'recent',
     // '!/:owner':               'byOwner',
     // FIXME: I would suggest to use !/repositories/:owner/:name, to make it more rest-like.
     // Because, for instance, now we should put myRepositories on top so that it could get matched. Unambigous routes rule!
@@ -44,9 +44,7 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     this.bind('build:queued',     this.buildQueued);
     this.bind('build:removed',    this.buildRemoved); /* UNTESTED */
 
-    this.repositories.fetch({
-      success: this.recent
-    });
+    this.repositories.fetch()
     this.workers.fetch();
     this.jobs.fetch();
     this.jobsRails.fetch();
@@ -59,7 +57,9 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     this.followBuilds = true;
     this.selectTab('current');
 
-    $('#main').append(new Travis.Views.Repository.Show({ parent: this, model: this.repositories.last() }).render().el)
+    this.repositories.whenFetched(_.bind(function() {
+      $('#main').html(new Travis.Views.Repository.Show({ parent: this, model: this.repositories.last() }).render().el)
+    }, this))
   },
   repository: function(owner, name, line_number) {
     console.log ("application#repository: ", arguments)
@@ -67,10 +67,14 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     this.trackPage();
     this.startLoading();
     window.params = { owner: owner, name: name, line_number: line_number, action: 'repository' }
-    this.selectTab('current');
-    this.repositories.whenFetched(_.bind(function(repositories) {
-      repositories.selectLastBy({ slug: owner + '/' + name });
-    }, this));
+
+    $('#main').html(
+      new Travis.Views.Repository.Show(
+        {
+          parent: this,
+          model: this.repositories.synchronousFetch({ slug: owner + '/' + name })
+        }).render().el)
+    this.stopLoading()
   },
   repositoryHistory: function(owner, name) {
     console.log ("application#repositoryHistory: ", arguments)
