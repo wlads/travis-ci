@@ -68,12 +68,14 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     this.startLoading();
     window.params = { owner: owner, name: name, line_number: line_number, action: 'repository' }
 
-    $('#main').html(
-      new Travis.Views.Repository.Show(
+    var view = new Travis.Views.Repository.Show(
         {
           parent: this,
           model: this.repositories.synchronousFetch({ slug: owner + '/' + name })
-        }).render().el)
+        })
+    view.render()
+    view.selectTab('current')
+    $('#main').html(view.el)
     this.stopLoading()
   },
   repositoryHistory: function(owner, name) {

@@ -23,6 +23,12 @@ var Travis = {
 };
 
 $(document).ready(function() {
+  // Handlebars helpers
+  Handlebars.registerHelper('compare_view_refs', function(compare_url) {
+    var parts = compare_url.split('/');
+    return parts[parts.length - 1];
+  });
+
   if(!window.__TESTING__ && $('#home').length == 1) {
     Travis.start();
     Backbone.history.start();
@@ -74,11 +80,6 @@ $(document).ready(function() {
     toggle_slider();
   });
 
-  // Handlebars helpers
-  Handlebars.registerHelper('compare_view_refs', function(compare_url) {
-    var parts = compare_url.split('/');
-    return parts[parts.length - 1];
-  });
 });
 
 if (window.console) {
