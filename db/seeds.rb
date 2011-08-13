@@ -4,7 +4,8 @@
 # TODO: This is the wrong place for seed data, for now
 #       it has been commented out, but this needs a new home
 if Rails.env.development? || Rails.env.jasmine?
-
+  Repository.delete_all
+  Build.delete_all
   minimal = Repository.create!({
     :owner_name => 'svenfuchs',
     :name => 'minimal',
@@ -87,4 +88,115 @@ if Rails.env.development? || Rails.env.jasmine?
     :log => File.read("#{Rails.root}/db/seeds/logs/svenfuchs.minimal.2.log")
   })
 
+  matrix_build_repository = Repository.create!(
+    :name => "travis-ci",
+    :url => "https://github.com/ifesdjeen/travis-ci",
+    :last_duration => nil,
+    :created_at => "2011-06-15 15:15:51",
+    :updated_at => "2011-08-04 17:53:48",
+    :last_build_number => "17",
+    :last_build_status => 1,
+    :last_build_started_at => "2011-08-04 17:48:43",
+    :last_build_finished_at => "2011-08-04 17:53:47",
+    :owner_name => "ifesdjeen",
+    :owner_email => "alexp@coffeenco.de",
+    :is_active => true)
+
+  matrix_build = Build.create(
+    :repository => matrix_build_repository,
+    :number => "17",
+    :status => 1,
+    :started_at => "2011-08-04 17:48:43",
+    :finished_at => "2011-08-04 17:53:47",
+    :log => "",
+    :commit => "ad81a635f98de21865f90d8c1f937cc7abb6dca0",
+    :message => "Missing templates and json file for repository test...",
+    :committed_at => "2011-06-12 12:44:31",
+    :committer_name => nil,
+    :committer_email => nil,
+    :author_name => "Oleksandr Petrov",
+    :author_email => "oleksandr.petrov@gmail.com",
+    :agent => nil,
+    :created_at => "2011-08-04 17:48:33",
+    :updated_at => "2011-08-04 17:53:48",
+    :parent_id => nil,
+    :config => {"script"=>"bundle exec rake db:drop db:create db:migrate test", "rvm"=>["1.8.7", "rbx-2.0", "ree"], ".configured"=>"true"},
+    :ref => nil,
+    :branch => "master",
+    :github_payload => "{\"pusher\":{\"name\":\"none\"},\"repository\":{\"name\":\"tra...",
+    :compare_url => "https://github.com/ifesdjeen/travis-ci/compare/47d0...",
+    :token => "QhVLbv8862HxRa45JrBq")
+
+
+  matrix_build.matrix<< Build.create!(
+    :repository => matrix_build_repository,
+    :number => "17.1",
+    :status => 1,
+    :started_at => "2011-08-04 17:48:42",
+    :finished_at => "2011-08-04 17:50:44",
+    :log => "Using worker => staging:worker-1\n\n$ git clone --depth...",
+    :commit => "ad81a635f98de21865f90d8c1f937cc7abb6dca0",
+    :message => "Missing templates and json file for repository test...",
+    :committed_at => "2011-06-12 12:44:31",
+    :committer_name => nil,
+    :committer_email => nil,
+    :author_name => "Oleksandr Petrov",
+    :author_email => "oleksandr.petrov@gmail.com",
+    :agent => nil,
+    :created_at => "2011-08-04 17:48:33",
+    :updated_at => "2011-08-04 17:50:45",
+    :config => {"script"=>"bundle exec rake db:drop db:create db:migrate test", "rvm"=>"1.8.7", ".configured"=>"true"},
+    :ref => nil,
+    :branch => "master",
+    :github_payload => "{\"pusher\":{\"name\":\"none\"},\"repository\":{\"name\":\"tra...",
+    :compare_url => "https://github.com/ifesdjeen/travis-ci/compare/47d0...",
+    :token => "QhVLbv8862HxRa45JrBq")
+
+  matrix_build.matrix<< Build.create!(
+    :repository => matrix_build_repository,
+    :number => "17.2",
+    :status => 1,
+    :started_at => "2011-08-04 17:48:43",
+    :finished_at => "2011-08-04 17:53:47",
+    :log => "Using worker => staging:worker-5\n\n$ git clone --depth...",
+    :commit => "ad81a635f98de21865f90d8c1f937cc7abb6dca0",
+    :message => "Missing templates and json file for repository test...",
+    :committed_at => "2011-06-12 12:44:31",
+    :committer_name => nil,
+    :committer_email => nil,
+    :author_name => "Oleksandr Petrov",
+    :author_email => "oleksandr.petrov@gmail.com",
+    :agent => nil,
+    :created_at => "2011-08-04 17:48:33",
+    :updated_at => "2011-08-04 17:53:48",
+    :config => {"script"=>"bundle exec rake db:drop db:create db:migrate test", "rvm"=>"rbx-2.0", ".configured"=>"true"},
+    :ref => nil,
+    :branch => "master",
+    :github_payload => "{\"pusher\":{\"name\":\"none\"},\"repository\":{\"name\":\"tra...",
+    :compare_url => "https://github.com/ifesdjeen/travis-ci/compare/47d0...",
+    :token => "QhVLbv8862HxRa45JrBq")
+
+  matrix_build.matrix<< Build.create!(
+    :repository => matrix_build_repository,
+    :number => "17.3",
+    :status => 1,
+    :started_at => "2011-08-04 17:48:43",
+    :finished_at => "2011-08-04 17:51:09",
+    :log => "Using worker => staging:worker-3\n\n$ git clone --depth...",
+    :commit => "ad81a635f98de21865f90d8c1f937cc7abb6dca0",
+    :message => "Missing templates and json file for repository test...",
+    :committed_at => "2011-06-12 12:44:31",
+    :committer_name => nil,
+    :committer_email => nil,
+    :author_name => "Oleksandr Petrov",
+    :author_email => "oleksandr.petrov@gmail.com",
+    :agent => nil,
+    :created_at => "2011-08-04 17:48:33",
+    :updated_at => "2011-08-04 17:51:10",
+    :config => {"script"=>"bundle exec rake db:drop db:create db:migrate test", "rvm"=>"ree", ".configured"=>"true"},
+    :ref => nil,
+    :branch => "master",
+    :github_payload => "{\"pusher\":{\"name\":\"none\"},\"repository\":{\"name\":\"tra...",
+    :compare_url => "https://github.com/ifesdjeen/travis-ci/compare/47d0...",
+    :token => "QhVLbv8862HxRa45JrBq")
 end
