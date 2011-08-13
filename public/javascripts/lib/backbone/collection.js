@@ -5,17 +5,27 @@ Travis.Collections.Base = Backbone.Collection.extend({
     Backbone.Collection.prototype.initialize.apply(this, arguments);
     _.bindAll(this, 'whenFetched', 'select', 'selectLast', 'selectLastBy', 'deselect', 'getOrFetchLast', 'getOrFetchLastBy', 'getBy', 'synchronousFetch', 'getOrFetch');
   },
-  fetch: function(options) {
+  fetchSynchronosly: function(options) {
+    return this.fetch(options, false)
+  },
+  fetch: function(options, async) {
     options || (options = {});
     var collection = this;
     this.startFetching();
-    var success = function(resp) {
-      collection[options.add ? 'add' : 'refresh'](collection.parse(resp));
-      if (options.success) options.success(collection, resp);
-    };
-    var error = Backbone.wrapError(options.error, collection, options);
-    (this.sync || Travis.sync)('read', this, success, error, options);
-    this.finishFetching();
+
+    if (async === false) {
+      var resp = (this.sync || Travis.sync)('read', this, null, error, false).responseText
+      collection[options.add ? 'add' : 'refresh'](JSON.parse(resp));
+      this.finishFetching();
+    } else {
+      var success = _.bind(function(resp) {
+        collection[options.add ? 'add' : 'refresh'](collection.parse(resp));
+        if (options.success) options.success(collection, resp);
+        this.finishFetching();
+      }, this);
+      var error = Backbone.wrapError(options.error, collection, options);
+      (this.sync || Travis.sync)('read', this, success, error, options);
+    }
     return this;
   },
   whenFetched: function(callback, options) {
@@ -68,7 +78,7 @@ Travis.Collections.Base = Backbone.Collection.extend({
   },
   synchronousFetch: function(options) {
     var model = new this.model(options, { collection: this })
-    model.fetch({ async: false })
+    model.fetchSynchronosly(options)
     return model
   },
   getBy: function(options) {

@@ -13,41 +13,51 @@ Travis.Models.Base = Backbone.Model.extend({
     this.selected = false;
     this.trigger('deselect', this);
   },
-
-  fetch : function(options) {
+  // That method lacks some consistency so far.
+  // Please use no callbacks when fetching synchronosly
+  fetchSynchronosly: function(options) {
+    return this.fetch(options, false)
+  },
+  fetch : function(options, async) {
     options || (options = {});
     var model = this;
-    var success = function(resp) {
+
+    if(async === false) {
+      var resp = JSON.parse( (this.sync || Travis.sync)('read', this, null, error, async).responseText)
       if (!model.set(model.parse(resp), options)) return false;
-      if (options.success) options.success(model, resp);
-    };
-    var error = Backbone.wrapError(options.error, model, options);
-    (this.sync || Travis.sync)('read', this, success, error);
+    } else {
+      var success = function(resp) {
+        if (!model.set(model.parse(resp), options)) return false;
+        if (options.success) options.success(model, resp);
+      };
+      var error = Backbone.wrapError(options.error, model, options);
+      (this.sync || Travis.sync)('read', this, success, error);
+    }
     return this;
   },
 });
 
-Travis.sync = function(method, model, success, error, options) {
-    var type = Backbone.methodMap[method];
-    var modelJSON = (method === 'create' || method === 'update') ?
-                    JSON.stringify(model.toJSON()) : null;
+Travis.sync = function(method, model, success, error, async) {
+  var type = Backbone.methodMap[method];
+  var modelJSON = (method === 'create' || method === 'update') ?
+    JSON.stringify(model.toJSON()) : null;
 
-    // Default JSON-request options.
-    var params = {
-      url:          Backbone.getUrl(model) || urlError(),
-      type:         type,
-      contentType:  'application/json',
-      data:         modelJSON,
-      dataType:     'json',
-      processData:  false,
-      success:      success,
-      error:        error
-    };
+  // Default JSON-request options.
+  var params = {
+    url:          Backbone.getUrl(model) || urlError(),
+    type:         type,
+    contentType:  'application/json',
+    data:         modelJSON,
+    dataType:     'json',
+    processData:  false,
+    success:      success,
+    error:        error,
+  };
 
-    if (options && options.async == false) {
-      params.async = false
-    }
-
-    // Make the request.
-    $.ajax(params);
+  if (async === false) {
+    params.async = false
   }
+
+  // Make the request.
+  return $.ajax(params);
+}
