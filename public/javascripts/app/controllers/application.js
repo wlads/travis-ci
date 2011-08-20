@@ -1,3 +1,6 @@
+/*
+  TODO: we need to implement before_filter for controller actions.
+ */
 Travis.Controllers.Application = Backbone.Controller.extend({
   routes: {
     '':                                          'recent',
@@ -10,22 +13,26 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     '!/:owner/:name/builds/:id/L:line_number':   'repositoryBuild',
     '!/:owner/:name/builds/:id':                 'repositoryBuild',
   },
+  _queues: [ 'builds', 'rails'],
   initialize: function() {
     _.bindAll(this, 'recent', 'byUser', 'repository', 'repositoryHistory', 'repositoryBuild', 'repositoryShow', 'repositorySelected', 'buildQueued', 'buildStarted', 'buildLogged', 'buildFinished', 'buildRemoved');
   },
 
   run: function() {
     this.repositories = new Travis.Collections.Repositories();
-    this.builds       = new Travis.Collections.AllBuilds();
-    this.jobs         = new Travis.Collections.Jobs([], { queue: 'builds' });
-    this.jobsRails    = new Travis.Collections.Jobs([], { queue: 'rails' });
+    // this.builds       = new Travis.Collections.AllBuilds();
     this.workers      = new Travis.Collections.Workers();
 
     this.repositoriesList = new Travis.Views.Repositories.List();
     // this.repositoryShow   = new Travis.Views.Repository.Show({ parent: this });
     this.workersView      = new Travis.Views.Workers.List();
-    this.jobsView         = new Travis.Views.Jobs.List({ queue: 'builds' });
-    this.jobsRailsView    = new Travis.Views.Jobs.List({ queue: 'rails' });
+
+    _.each(this._queues, _.bind(function(queue_name){
+      this["queue" + name ] = new Travis.Collections.Jobs([], { queue: queue_name });
+      this["queueView" + name ] = new Travis.Views.Jobs.List({ queue: queue_name });
+      this["queueView" + name ].attachTo(this["queue" + name])
+      this["queue" + name ].fetch();
+    }, this))
 
     $('#left #tab_recent .tab').append(this.repositoriesList.render().el);
     // $('#main').append(this.repositoryShow.render().el);
@@ -33,8 +40,6 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     this.repositoriesList.attachTo(this.repositories);
     // this.repositoryShow.attachTo(this.repositories)
     this.workersView.attachTo(this.workers)
-    this.jobsView.attachTo(this.jobs)
-    this.jobsRailsView.attachTo(this.jobsRails)
     // this.repositories.bind('select', this.repositorySelected);
 
     this.bind('build:started',    this.buildStarted);
@@ -46,8 +51,6 @@ Travis.Controllers.Application = Backbone.Controller.extend({
 
     this.repositories.fetch()
     this.workers.fetch();
-    this.jobs.fetch();
-    this.jobsRails.fetch();
   },
 
   // actions
@@ -55,8 +58,6 @@ Travis.Controllers.Application = Backbone.Controller.extend({
   recent: function() {
     this.reset();
     this.followBuilds = true;
-    this.selectTab('current');
-
     this.repositories.whenFetched(_.bind(function() {
       $('#main').html(new Travis.Views.Repository.Show({ parent: this, model: this.repositories.last() }).render().el)
     }, this))
@@ -71,7 +72,8 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     var view = new Travis.Views.Repository.Show(
         {
           parent: this,
-          model: this.repositories.synchronousFetch({ slug: owner + '/' + name })
+          model: this.repositories.synchronousFetch({ slug: owner + '/' + name }),
+          tab_names: [ 'current', 'history' ]
         })
     view.render()
     view.selectTab('current')
@@ -116,6 +118,7 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     $('#main').removeClass('loading')
   },
   trackPage: function() {
+    // My string opinion that this function should be embedded or chained on some
     window._gaq = _gaq || [];
     window._gaq.push(['_trackPageview']);
   },
@@ -184,10 +187,13 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     this.jobsCollection(data).remove({ id: data.build.id });
   },
   jobsCollection: function(data) {
-    return this.buildingRails(data) ? this.jobsRails : this.jobs;
+    return this["queue" + this.getQueueName(data)];
   },
-  buildingRails: function (data) {
-    return data.slug && data.slug == 'rails/rails';
+  // TODO: that logic should be taken to a different class
+  getQueueName: function (data) {
+    if (data.slug && data.slug == 'rails/rails')
+      return 'rails'
+    return 'builds'
   }
 });
 
