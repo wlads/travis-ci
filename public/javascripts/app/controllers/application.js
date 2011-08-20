@@ -143,6 +143,17 @@ Travis.Controllers.Application = Backbone.Controller.extend({
 
   // external events
 
+  /*
+    TODO: all these things should be re-imlemented like bindings.
+
+    These things will simply react to some change and trigger change events in some other bindings or models. They will store history of changes. Binding can be attached to the certain instance.
+
+    Having Data-store implemented, we can even dispatch binding events to several instances (we just need to know where to attach).
+
+    Also, we can involve some logic and create a set of rules for each binding. If this happen - do that. If upper limit have reached, trigger this, lower - that, under these circumstances one behavior under other ones - different.
+
+    That way we could even avoid creation of so many "events". we simply create bindnings istead
+   */
   buildQueued: function(data) {
     console.log ("application#buildQueued: ", arguments)
     this.addJob(data);
