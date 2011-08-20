@@ -1,3 +1,10 @@
+/*
+ TODO: Actually, after looking @ SproutCore, i've got an idea about DataStore.
+ it could be easily implemented on that level. All we need is 2 things: know wether the model
+ is fully or partially loaded (to server-fetch modes that are loaded just partially) and
+ persistence on the Object, not instance level (speaking more in OOP, not prototype terms) - ifesdjeen
+
+ */
 Travis.Collections.Base = Backbone.Collection.extend({
   fetched: false,
   fetching: false,
