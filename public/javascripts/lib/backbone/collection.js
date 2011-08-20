@@ -4,13 +4,48 @@
  is fully or partially loaded (to server-fetch modes that are loaded just partially) and
  persistence on the Object, not instance level (speaking more in OOP, not prototype terms) - ifesdjeen
 
+ Turns out that before we can do so, we should implement a normal object model in JS.
+
  */
+Travis.Store = {}
+
 Travis.Collections.Base = Backbone.Collection.extend({
   fetched: false,
   fetching: false,
   initialize: function() {
     Backbone.Collection.prototype.initialize.apply(this, arguments);
     _.bindAll(this, 'whenFetched', 'select', 'selectLast', 'selectLastBy', 'deselect', 'getOrFetchLast', 'getOrFetchLastBy', 'getBy', 'synchronousFetch', 'getOrFetch');
+  },
+  getStore: function() {
+    var store = undefined
+    _.each(Travis.Collections, _.bind(function(model_klass, klass_name) {
+      if (this instanceof model_klass) {
+        if (Travis.Store[klass_name]) {
+          store = Travis.Store[klass_name]
+        }
+        else {
+          Travis.Store[klass_name] = {}
+          store = Travis.Store[klass_name]
+        }
+      }
+    }, this))
+      return store;
+  },
+  add: function(models, options) {
+    if (_.isArray(models)) {
+      for (var i = 0, l = models.length; i < l; i++) {
+        var model = this._add(models[i], options);
+        if (model) {
+          this.getStore()[model.id] = model
+        }
+      }
+    } else {
+      var model = this._add(models, options);
+      if (model) {
+        this.getStore()[model.id] = model
+      }
+    }
+    return this
   },
   fetchSynchronosly: function(options) {
     return this.fetch(options, false)
