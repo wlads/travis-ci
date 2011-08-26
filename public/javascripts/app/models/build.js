@@ -110,8 +110,8 @@ Travis.Collections.Builds = Travis.Collections.Base.extend({
     this.args = this.args || {};
   },
   _add: function(model, options) {
-    Travis.Collections.Base.prototype._add.apply(this, arguments);
-    if(Travis.app) Travis.app.builds._add(model);
+    return Travis.Collections.Base.prototype._add.apply(this, arguments);
+    // if(Travis.app) Travis.app.builds._add(model);
   },
   update: function(attributes) {
     if(attributes) {
@@ -129,6 +129,7 @@ Travis.Collections.Builds = Travis.Collections.Base.extend({
     return '/repositories/' + this.repository.id + '/builds' + Utils.queryString(this.args);
   },
   dimensions: function() {
+    if (_.first(this.models).get('config'))
     return this.models[0] ?
       _.select(_(this.models[0].get('config')).keys(), function(key) {
         return _.include(Travis.DISPLAYED_KEYS, key)

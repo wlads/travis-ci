@@ -6,8 +6,9 @@
 
  Turns out that before we can do so, we should implement a normal object model in JS.
 
+ The main purpose of Store is to allow to use 1 instance of model all over the place
  */
-Travis.Store = {}
+Travis.Store = {};
 
 Travis.Collections.Base = Backbone.Collection.extend({
   fetched: false,
@@ -17,32 +18,32 @@ Travis.Collections.Base = Backbone.Collection.extend({
     _.bindAll(this, 'whenFetched', 'select', 'selectLast', 'selectLastBy', 'deselect', 'getOrFetchLast', 'getOrFetchLastBy', 'getBy', 'synchronousFetch', 'getOrFetch');
   },
   getStore: function() {
-    var store = undefined
+    var store = undefined;
     _.each(Travis.Collections, _.bind(function(model_klass, klass_name) {
       if (this instanceof model_klass) {
         if (Travis.Store[klass_name]) {
-          store = Travis.Store[klass_name]
+          store = Travis.Store[klass_name];
         }
         else {
-          Travis.Store[klass_name] = {}
-          store = Travis.Store[klass_name]
+          Travis.Store[klass_name] = new Backbone.Collection()
+          store = Travis.Store[klass_name];
         }
       }
-    }, this))
-      return store;
+    }, this));
+    return store;
   },
   add: function(models, options) {
     if (_.isArray(models)) {
       for (var i = 0, l = models.length; i < l; i++) {
         var model = this._add(models[i], options);
         if (model) {
-          this.getStore()[model.id] = model
+          this.getStore().add(model)
         }
       }
     } else {
       var model = this._add(models, options);
       if (model) {
-        this.getStore()[model.id] = model
+        this.getStore().add(model.id) = model
       }
     }
     return this
@@ -124,12 +125,13 @@ Travis.Collections.Base = Backbone.Collection.extend({
     return model
   },
   getBy: function(options) {
-    return this.detect(function(element) {
+    return this.getStore().detect(function(element) {
       return _.all(options, function(value, name) { return element.get(name) == value; })
     });
   },
   getOrFetch: function(id, callback) {
     var element = this.get(id);
+
     if(element) {
       callback(element);
     } else {

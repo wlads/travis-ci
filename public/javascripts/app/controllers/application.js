@@ -69,39 +69,43 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     this.startLoading();
     window.params = { owner: owner, name: name, line_number: line_number, action: 'repository' }
 
-    var view = new Travis.Views.Repository.Show(
-        {
-          parent: this,
-          model: this.repositories.synchronousFetch({ slug: owner + '/' + name }),
-          tab_names: [ 'current', 'history' ]
-        })
-    view.render()
-    view.selectTab('current')
-    $('#main').html(view.el)
+    var model = this.repositories.synchronousFetch({ slug: owner + '/' + name })
+    model.builds.fetchSynchronosly()
+    console.log(model.builds.first())
+    $('#main').html(new Travis.Views.Build.Build({ build: model.builds.first()  }).render().el)
     this.stopLoading()
   },
   repositoryHistory: function(owner, name) {
     console.log ("application#repositoryHistory: ", arguments)
     this.reset();
     this.trackPage();
-    this.selectTab('history');
-    this.repositories.whenFetched(_.bind(function(repositories) {
-      repositories.selectLastBy({ slug: owner + '/' + name })
+    this.startLoading();
 
-    }, this));
+    $('#main').html(new Travis.Views.Build.History({ model: this.repositories.synchronousFetch({ slug: owner + '/' + name }) }).render().el)
+    this.stopLoading()
   },
   repositoryBuild: function(owner, name, buildId, line_number) {
-    console.log ("application#repositoryBuild: ", arguments)
     this.reset();
     this.trackPage();
     this.startLoading();
-    window.params = { owner: owner, name: name, build_id: buildId, line_number: line_number, action: 'repositoryBuild' }
-    this.buildId = parseInt(buildId);
-    this.selectTab('build');
-    this.repositories.whenFetched(_.bind(function(repositories) {
-      repositories.selectLastBy({ slug: owner + '/' + name })
+    window.params = { owner: owner, name: name, build_id: buildId, line_number: line_number, action: 'repositoryBuild' };
 
+    var repository = this.repositories.synchronousFetch({ slug: owner + '/' + name });
+    var view = new Travis.Views.Repository.Show(
+        {
+          parent: this,
+          model: repository,
+          tab_names: [ 'current', 'history', 'build' ]
+        })
+    view.render();
+
+    this.selectTab('build');
+
+    repository.builds.getOrFetch(buildId, _.bind(function(build) {
+      $('#main').html(new Travis.Views.Build.Build({ build: build }).render().el);
+      this.stopLoading();
     }, this));
+    
   },
 
   // helpers

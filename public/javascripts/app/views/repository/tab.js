@@ -11,17 +11,17 @@ Travis.Views.Repository.Tab = Backbone.View.extend({
     this.template = Travis.templates['repository/tab_' + this.name];
   },
   render: function() {
-    this.el = $(this.template({}));
+    this.el = $(this.template(this.model.toJSON()));
     this.content = new this.contents[this.name]({ name: this.name, parent: this, model: this.model});
     this.el.find('.tab').append(this.content.render().el);
     return this;
   },
   detach: function() {
-    // this.content.detach();
+    this.content.detach();
   },
   attachTo: function(repository) {
-    // this.detach();
-    // this.content.attachTo(repository);
+    this.detach();
+    this.content.attachTo(repository);
   },
   activate: function() {
     this.el.last().addClass('active');
