@@ -129,6 +129,15 @@ Travis.Collections.Base = Backbone.Collection.extend({
       return _.all(options, function(value, name) { return element.get(name) == value; })
     });
   },
+  get: function(id) {
+    if (id == null) return null;
+    var model = this._byId[id.id != null ? id.id : id];
+    if (_.isUndefined(model)) {
+      return this.getStore().get(id);
+    } else {
+      return model;
+    }
+  },
   getOrFetch: function(id, callback) {
     var element = this.get(id);
 

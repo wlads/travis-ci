@@ -11,7 +11,7 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     '!/:owner/:name':                            'repository',
     '!/:owner/:name/builds':                     'repositoryHistory',
     '!/:owner/:name/builds/:id/L:line_number':   'repositoryBuild',
-    '!/:owner/:name/builds/:id':                 'repositoryBuild',
+    '!/:owner/:name/builds/:id':                 'repositoryBuild'
   },
   _queues: [ 'builds', 'rails'],
   initialize: function() {
@@ -81,7 +81,7 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     this.trackPage();
     this.startLoading();
 
-    $('#main').html(new Travis.Views.Build.History({ model: this.repositories.synchronousFetch({ slug: owner + '/' + name }) }).render().el)
+    $('#main').html(new Travis.Views.Build.History.Table({ model: this.repositories.synchronousFetch({ slug: owner + '/' + name }) }).render().el)
     this.stopLoading()
   },
   repositoryBuild: function(owner, name, buildId, line_number) {
@@ -90,22 +90,11 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     this.startLoading();
     window.params = { owner: owner, name: name, build_id: buildId, line_number: line_number, action: 'repositoryBuild' };
 
-    var repository = this.repositories.synchronousFetch({ slug: owner + '/' + name });
-    var view = new Travis.Views.Repository.Show(
-        {
-          parent: this,
-          model: repository,
-          tab_names: [ 'current', 'history', 'build' ]
-        })
-    view.render();
+    var model = this.repositories.synchronousFetch({ slug: owner + '/' + name })
+    model.builds.fetchSynchronosly()
 
-    this.selectTab('build');
-
-    repository.builds.getOrFetch(buildId, _.bind(function(build) {
-      $('#main').html(new Travis.Views.Build.Build({ build: build }).render().el);
-      this.stopLoading();
-    }, this));
-    
+    $('#main').html(new Travis.Views.Build.Build({ build: model.builds.get(buildId) }).render().el);
+    this.stopLoading();
   },
 
   // helpers

@@ -5,7 +5,7 @@ Travis.Views.Build.History.Table = Backbone.View.extend({
     this.template = Travis.templates['build/history/table'];
 
     this.render();
-
+    this.builds = this.model.builds.fetchSynchronosly()
     if(this.repository) {
       this.attachTo(this.repository);
     }
