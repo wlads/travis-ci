@@ -15,7 +15,7 @@ Travis.Models.Repository = Travis.Models.Base.extend({
   },
   set: function(attributes) { // TODO rename to update, add unit tests
     this.builds = this.builds || new Travis.Collections.Builds([], { repository: this });
-    if(attributes.build) this.builds.update(attributes.build);
+    if(attributes.build) this.builds.add(attributes.build);
     delete attributes.build;
     Backbone.Model.prototype.set.apply(this, [attributes]);
     return this;

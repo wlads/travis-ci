@@ -1,9 +1,69 @@
+/*
+ TODO: Actually, after looking @ SproutCore, i've got an idea about DataStore.
+ it could be easily implemented on that level. All we need is 2 things: know wether the model
+ is fully or partially loaded (to server-fetch modes that are loaded just partially) and
+ persistence on the Object, not instance level (speaking more in OOP, not prototype terms) - ifesdjeen
+
+ Turns out that before we can do so, we should implement a normal object model in JS.
+
+ The main purpose of Store is to allow to use 1 instance of model all over the place
+ */
+Travis.Store = {};
+
 Travis.Collections.Base = Backbone.Collection.extend({
   fetched: false,
   fetching: false,
   initialize: function() {
     Backbone.Collection.prototype.initialize.apply(this, arguments);
     _.bindAll(this, 'whenFetched', 'select', 'selectLast', 'selectLastBy', 'deselect', 'getOrFetchLast', 'getOrFetchLastBy', 'getBy', 'synchronousFetch', 'getOrFetch');
+  },
+  getStore: function() {
+    var store = undefined;
+    _.each(Travis.Collections, _.bind(function(model_klass, klass_name) {
+      if (this instanceof model_klass) {
+        if (Travis.Store[klass_name]) {
+          store = Travis.Store[klass_name];
+        }
+        else {
+          Travis.Store[klass_name] = new Backbone.Collection();
+          store = Travis.Store[klass_name];
+        }
+      }
+    }, this));
+    return store;
+  },
+  add: function(models, options) {
+    if (_.isArray(models)) {
+      for (var i = 0, l = models.length; i < l; i++) {
+        var model = this._add(models[i], options);
+        if (model) {
+          if (this.getStore().indexOf(model) > 0) {
+            this.getStore().add(model);            
+          } else {
+            this.getStore().add(model, { at: this.getStore().indexOf(model) });
+          }
+        }
+      }
+    } else {
+      var model = this._add(models, options);
+      if (model) {
+        if (this.getStore().indexOf(model) > 0) {
+          this.getStore().add(model);            
+        } else {
+          this.getStore().add(model, { at: this.getStore().indexOf(model) });
+        }
+      }
+    }
+    return this;
+  },
+  get: function(id) {
+    if (id == null) return null;
+    var model = this._byId[id.id != null ? id.id : id];
+    if (_.isUndefined(model)) {
+      return this.getStore().get(id);
+    } else {
+      return model;
+    }
   },
   fetch: function(options) {
     options || (options = {});
@@ -17,20 +77,6 @@ Travis.Collections.Base = Backbone.Collection.extend({
     (this.sync || Travis.sync)('read', this, success, error, options);
     this.finishFetching();
     return this;
-
-    // options = options || {};
-    // var collection = this;
-    // this.startFetching();
-    // return Backbone.Collection.prototype.fetch.call(this, {
-    //   success: function() {
-    //     if(options.success) options.success.apply(this, arguments);
-    //     collection.finishFetching();
-    //   }.bind(this),
-    //   error: function(e) {
-    //     if(options.error) options.error.apply(this, arguments);
-    //     collection.finishFetching();
-    //   }.bind(this)
-    // });
   },
   whenFetched: function(callback, options) {
     if(!this.fetched || this.fetching) {
@@ -48,7 +94,7 @@ Travis.Collections.Base = Backbone.Collection.extend({
     this.getOrFetch(id, function(element) { if(element) element.select(); });
   },
   selectLast: function() {
-    this.getOrFetchLast(function(element) { if(element) element.select(); })
+    this.getOrFetchLast(function(element) { if(element) element.select(); });
   },
   selectLastBy: function(options) {
     this.getOrFetchLastBy(options, function(element) { if(element) element.select(); });

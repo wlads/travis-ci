@@ -82,18 +82,18 @@ Travis.Models.Build = Travis.Models.Base.extend({
       commit: this.commit(),
       eta: this.eta(),
       color: this.color(),
-      repository: this.repository.toJSON(),
+      repository: this.repository.toJSON()
     });
     if(this.matrix) {
       json['matrix'] = this.matrix.toJSON();
     }
     if(this.get('config')) {
-      var humanReadableConfig = {}
+      var humanReadableConfig = {};
       _.map(this.get('config'), function(v, k) {
         if (_.include(Travis.DISPLAYED_KEYS, k)) {
-          humanReadableConfig[k] = v
+          humanReadableConfig[k] = v;
         }
-      })
+      });
       json['config_table'] = _.map(humanReadableConfig, function(value, key) { return { key: key, value: value } } );
       json['config'] = _.map(humanReadableConfig, function(value, key) { return key + ': ' + value; } ).join(', ');
     }
@@ -110,8 +110,8 @@ Travis.Collections.Builds = Travis.Collections.Base.extend({
     this.args = this.args || {};
   },
   _add: function(model, options) {
-    Travis.Collections.Base.prototype._add.apply(this, arguments);
-    if(Travis.app) Travis.app.builds._add(model);
+    return Travis.Collections.Base.prototype._add.apply(this, arguments);
+    // if(Travis.app) Travis.app.builds._add(model);
   },
   update: function(attributes) {
     if(attributes) {
@@ -131,16 +131,16 @@ Travis.Collections.Builds = Travis.Collections.Base.extend({
   dimensions: function() {
     return this.models[0] ?
       _.select(_(this.models[0].get('config')).keys(), function(key) {
-        return _.include(Travis.DISPLAYED_KEYS, key)
+        return _.include(Travis.DISPLAYED_KEYS, key);
       }).map(function(key) {
-        return _.capitalize(key)
+        return _.capitalize(key);
       }) : [];
   },
   comparator: function(build) {
     // this sorts matrix child builds below their child builds, i.e. the actual order will be like: 4, 3, 3.1, 3.2, 3.3., 2, 1
     var number = String(build.get('number'));
     var fraction = parseInt(number.substr(number.indexOf('.') + 1));
-    return parseInt(number) * 100000 - fraction
+    return parseInt(number) * 100000 - fraction;
   }
 });
 
@@ -152,6 +152,6 @@ Travis.Collections.AllBuilds = Travis.Collections.Builds.extend({
     model.collection = collection;
     model.cid = cid;
     return this;
-  },
-})
+  }
+});
 

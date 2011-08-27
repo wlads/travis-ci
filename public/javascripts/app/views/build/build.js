@@ -1,13 +1,13 @@
 Travis.Views.Build.Build = Backbone.View.extend({
   initialize: function() {
-    _.bindAll(this, 'attachTo', 'buildSelected', 'buildConfigured', 'updateTab');
+    _.bindAll(this, 'attachTo', 'buildSelected', 'buildConfigured', 'updateTab', '_update');
     _.extend(this, this.options);
 
     this.el = $('<div></div>');
-    if(this.repository) {
-      this.render();
-      this.attachTo(this.repository);
-    }
+    // if(this.repository) {
+      // this.render();
+      // this.attachTo(this.repository);
+    // }
   },
   render: function() {
     if(this.repository) this._update();

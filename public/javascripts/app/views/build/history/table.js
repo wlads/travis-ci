@@ -42,7 +42,7 @@ Travis.Views.Build.History.Table = Backbone.View.extend({
   _update: function() {
     this.el.find('tbody').empty();
     if(this.builds) this.builds.each(this._prependRow);
-    if(this.parent && this.repository) this.parent.updateTab();
+    // if(this.parent && this.repository) this.parent.updateTab();
 
     this.loadMore = $("<tr class='load_more' colspan=''><td>Load More...</td></tr>")
     this.el.find('tbody').append(this.loadMore)

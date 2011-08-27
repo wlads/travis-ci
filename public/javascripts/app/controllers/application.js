@@ -8,35 +8,41 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     '!/:owner/:name':                            'repository',
     '!/:owner/:name/builds':                     'repositoryHistory',
     '!/:owner/:name/builds/:id/L:line_number':   'repositoryBuild',
-    '!/:owner/:name/builds/:id':                 'repositoryBuild',
+    '!/:owner/:name/builds/:id':                 'repositoryBuild'
   },
+  _queues: [ 'builds', 'rails'],
+  before_filter: [ 'reset', 'trackPage', 'startLoading' ],
   initialize: function() {
-    _.bindAll(this, 'recent', 'byUser', 'repository', 'repositoryHistory', 'repositoryBuild', 'repositoryShow', 'repositorySelected', 'buildQueued', 'buildStarted', 'buildLogged', 'buildFinished', 'buildRemoved');
+    _.bindAll(this, 'recent', 'byUser', 'repository', 'repositoryHistory', 'repositoryBuild', 'repositoryShow', 'repositorySelected', 'buildQueued', 'buildStarted', 'buildLogged', 'buildFinished', 'buildRemoved', 'route');
   },
-
+  route: function() {
+    if (this.before_filter) {
+      _.each(this.before_filter, _.bind(function(filter){
+        this[filter]();
+      }, this));
+    }
+    Backbone.Controller.prototype.route.apply(this, arguments);
+  },
   run: function() {
     this.repositories = new Travis.Collections.Repositories();
-    this.builds       = new Travis.Collections.AllBuilds();
-    this.jobs         = new Travis.Collections.Jobs([], { queue: 'builds' });
-    this.jobsRails    = new Travis.Collections.Jobs([], { queue: 'rails' });
     this.workers      = new Travis.Collections.Workers();
 
     this.repositoriesList = new Travis.Views.Repositories.List();
-    this.repositoryShow   = new Travis.Views.Repository.Show({ parent: this });
     this.workersView      = new Travis.Views.Workers.List();
-    this.jobsView         = new Travis.Views.Jobs.List({ queue: 'builds' });
-    this.jobsRailsView    = new Travis.Views.Jobs.List({ queue: 'rails' });
+
+    _.each(this._queues, _.bind(function(queue_name){
+      this["queue" + name ] = new Travis.Collections.Jobs([], { queue: queue_name });
+      this["queueView" + name ] = new Travis.Views.Jobs.List({ queue: queue_name });
+      this["queueView" + name ].attachTo(this["queue" + name]);
+      this["queue" + name ].fetch();
+    }, this));
 
     $('#left #tab_recent .tab').append(this.repositoriesList.render().el);
-    $('#main').append(this.repositoryShow.render().el);
 
     this.repositoriesList.attachTo(this.repositories);
-    this.repositoryShow.attachTo(this.repositories)
-    this.workersView.attachTo(this.workers)
-    this.jobsView.attachTo(this.jobs)
-    this.jobsRailsView.attachTo(this.jobsRails)
-    this.repositories.bind('select', this.repositorySelected);
+    this.workersView.attachTo(this.workers);
 
+    // This bindings should move models, since they're model-specific. We always have an instance of application, so we can bind to it any time we want to.
     this.bind('build:started',    this.buildStarted);
     this.bind('build:finished',   this.buildFinished);
     this.bind('build:configured', this.buildConfigured);
@@ -44,52 +50,47 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     this.bind('build:queued',     this.buildQueued);
     this.bind('build:removed',    this.buildRemoved); /* UNTESTED */
 
+    this.repositories.fetch();
     this.workers.fetch();
-    this.jobs.fetch();
-    this.jobsRails.fetch();
   },
 
   // actions
 
   recent: function() {
-    this.reset();
     this.followBuilds = true;
     this.selectTab('current');
     this.repositories.selectLast();
   },
   repository: function(owner, name, line_number) {
-    console.log ("application#repository: ", arguments)
-    this.reset();
-    this.trackPage();
-    this.startLoading();
-    window.params = { owner: owner, name: name, line_number: line_number, action: 'repository' }
-    this.selectTab('current');
-    this.repositories.whenFetched(_.bind(function(repositories) {
-      repositories.selectLastBy({ slug: owner + '/' + name });
-    }, this));
+    console.log ("application#repository: ", arguments);
+    window.params = { owner: owner, name: name, line_number: line_number, action: 'repository' };
+
+    new Travis.Models.Repository({ slug: owner + '/' + name }).fetch({ success: _.bind(function(repository) {
+      $('#main').html(new Travis.Views.Build.Build({ repository: repository, build: repository.builds.first()  }).render().el);
+      this.stopLoading();
+    }, this)});
   },
   repositoryHistory: function(owner, name) {
-    console.log ("application#repositoryHistory: ", arguments)
-    this.reset();
-    this.trackPage();
-    this.selectTab('history');
-    this.repositories.whenFetched(_.bind(function(repositories) {
-      repositories.selectLastBy({ slug: owner + '/' + name })
+    console.log ("application#repositoryHistory: ", arguments);
 
-    }, this));
+    new Travis.Models.Repository({ slug: owner + '/' + name }).fetch({ success: _.bind(function(repository) {
+      repository.builds.fetch({ success: _.bind(function(builds) { 
+        $("#main").html(new Travis.Views.Build.History.Table({ builds: builds, repository: repository }).render().el);
+        this.stopLoading();
+      }, this) });
+
+    }, this)});
   },
   repositoryBuild: function(owner, name, buildId, line_number) {
-    console.log ("application#repositoryBuild: ", arguments)
-    this.reset();
-    this.trackPage();
-    this.startLoading();
-    window.params = { owner: owner, name: name, build_id: buildId, line_number: line_number, action: 'repositoryBuild' }
-    this.buildId = parseInt(buildId);
-    this.selectTab('build');
-    this.repositories.whenFetched(_.bind(function(repositories) {
-      repositories.selectLastBy({ slug: owner + '/' + name })
+    console.log ("application#repositoryBuild: ", arguments);
+    window.params = { owner: owner, name: name, build_id: buildId, line_number: line_number, action: 'repositoryBuild' };
 
-    }, this));
+    new Travis.Models.Repository({ slug: owner + '/' + name }).fetch({ success: _.bind(function(repository) {
+      repository.builds.fetch({ success: _.bind(function(builds) { 
+        $("#main").html(new Travis.Views.Build.Build({ build: builds.get(parseInt(buildId)), repository: repository }).render().el);
+        this.stopLoading();
+      }, this) });
+    }, this)});
   },
 
   // helpers
@@ -100,10 +101,10 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     window.params = {};
   },
   startLoading: function() {
-    $('#main').addClass('loading')
+    $('#main').addClass('loading');
   },
   stopLoading: function() {
-    $('#main').removeClass('loading')
+    $('#main').removeClass('loading');
   },
   trackPage: function() {
     window._gaq = _gaq || [];
@@ -113,7 +114,7 @@ Travis.Controllers.Application = Backbone.Controller.extend({
 
   // internal events
   repositorySelected: function(repository) {
-    repository.builds.bind('finish_get_or_fetch', function() { this.stopLoading() }.bind(this))
+    repository.builds.bind('finish_get_or_fetch', function() { this.stopLoading(); }.bind(this));
 
     switch(this.tab) {
       case 'current':
@@ -174,11 +175,14 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     this.jobsCollection(data).remove({ id: data.build.id });
   },
   jobsCollection: function(data) {
-    return this.buildingRails(data) ? this.jobsRails : this.jobs;
+    return this["queue" + this.getQueueName(data)];
   },
-  buildingRails: function (data) {
-    return data.slug && data.slug == 'rails/rails';
+  getQueueName: function (data) {
+    if (data.slug && data.slug == 'rails/rails')
+      return 'rails'
+    return 'builds'
   }
+
 });
 
 
