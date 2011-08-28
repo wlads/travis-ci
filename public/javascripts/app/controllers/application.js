@@ -129,7 +129,9 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     window._gaq = _gaq || [];
     window._gaq.push(['_trackPageview']);
   },
-
+  updateRepositories: function(data) {
+    this.repositories.update(data); 
+  },
 
   // internal events
   repositorySelected: function(repository) {
@@ -157,7 +159,7 @@ Travis.Controllers.Application = Backbone.Controller.extend({
   buildStarted: function(data) {
     console.log ("application#buildStarted: ", arguments)
     this.removeJob(data);
-    this.repositories.update(data);
+    this.updateRepositories(data);
 
     if((this.followBuilds || this.tab == 'current' && this.repositories.selected().get('slug') == data.slug) && !this.buildId && !data.build.parent_id) {
       var repository = this.repositories.get(data.id);
@@ -168,11 +170,11 @@ Travis.Controllers.Application = Backbone.Controller.extend({
   buildConfigured: function(data) {
     console.log ("application#buildConfigured: ", arguments)
     this.removeJob(data);
-    this.repositories.update(data);
+    this.updateRepositories(data);
   },
   buildFinished: function(data) {
     console.log ("application#buildFinished: ", arguments)
-    this.repositories.update(data);
+    this.updateRepositories(data);
   },
   buildRemoved: function(data) {
     console.log ("application#buildRemoved: ", arguments)
@@ -180,7 +182,7 @@ Travis.Controllers.Application = Backbone.Controller.extend({
   },
   buildLogged: function(data) {
     console.log ("application#buildLogged: ", arguments)
-    this.repositories.update(data);
+    this.updateRepositories(data);
   },
 
   selectTab: function(tab) {
