@@ -24,6 +24,10 @@
       <%= include_javascripts :jasmine %>
     <% end %>
     <%= stylesheet_link_tag 'application', 'jquery.tipsy.css' %>
+    
+    <% if current_user %>
+      <%= javascript_tag "var currentUser = '#{current_user.login}';" %>
+    <% end %>
 
     <%= include_javascripts :travis %>
     <%= include_javascripts :templates %>

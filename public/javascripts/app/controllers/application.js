@@ -1,6 +1,8 @@
 Travis.Controllers.Application = Backbone.Controller.extend({
   routes: {
     '':                                          'recent',
+    '!/repositories/recent':                     'recent',
+    '!/repositories/mine':                       'mine',
     // '!/:owner':               'byOwner',
     // FIXME: I would suggest to use !/repositories/:owner/:name, to make it more rest-like.
     // Because, for instance, now we should put myRepositories on top so that it could get matched. Unambigous routes rule!
@@ -17,13 +19,13 @@ Travis.Controllers.Application = Backbone.Controller.extend({
 
   run: function() {
     this.repositories   = new Travis.Collections.Repositories();
-    this.myRepositories = new Travis.Collections.Repositories([], { owner_name: 'svenfuchs' });
+    this.myRepositories = new Travis.Collections.Repositories([], { owner_name: this.currentUser });
     this.builds         = new Travis.Collections.AllBuilds();
     this.jobs           = new Travis.Collections.Jobs([], { queue: 'builds' });
     this.jobsRails      = new Travis.Collections.Jobs([], { queue: 'rails' });
     this.workers        = new Travis.Collections.Workers();
 
-    this.repositoryLists = new Travis.Views.Repositories.Lists();
+    this.repositoryLists = new Travis.Views.Repositories.Lists(this.currentUser);
     this.repositoryShow  = new Travis.Views.Repository.Show({ parent: this });
     this.workersView     = new Travis.Views.Workers.List();
     this.jobsView        = new Travis.Views.Jobs.List({ queue: 'builds' });
@@ -33,6 +35,7 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     $('#main').append(this.repositoryShow.render().el);
 
     this.repositoryLists.attachTo('recent', this.repositories);
+    this.repositoryLists.attachTo('mine', this.myRepositories);
     this.repositoryShow.attachTo(this.repositories)
     this.workersView.attachTo(this.workers)
     this.jobsView.attachTo(this.jobs)
@@ -66,6 +69,7 @@ Travis.Controllers.Application = Backbone.Controller.extend({
   mine: function() {
     this.reset();
     this.followBuilds = true;
+    this.repositoryLists.activateTab('mine');
     this.selectTab('current');
     this.myRepositories.whenFetched(_.bind(function () {
       this.myRepositories.selectLast();

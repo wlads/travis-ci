@@ -35,12 +35,16 @@ Travis.Views.Repositories.List = Backbone.View.extend({
 
 Travis.Views.Repositories.Lists = Backbone.View.extend({
   tabs: {},
-  initialize: function() {
+  initialize: function(currentUser) {
     _.bindAll(this, '_createTab', '_renderTab');
+
     this.template = Travis.templates['repositories/lists'];
     
     this._createTab('recent', 'Recent');
-    this._createTab('mine',   'My Repositories');
+    
+    if (currentUser) {
+      this._createTab('mine',   'My Repositories');
+    }
   },
   attachTo: function(tabName, collection) {
     this.tabs[tabName].attachTo(collection);

@@ -37,10 +37,10 @@ Travis.Models.Repository = Travis.Models.Base.extend({
 
 Travis.Collections.Repositories = Travis.Collections.Base.extend({
   model: Travis.Models.Repository,
-  initialize: function(models) {
+  initialize: function(models, options) {
     Travis.Collections.Base.prototype.initialize.apply(this, arguments);
     _.bindAll(this, 'url', 'update', 'setFilter');
-    this.options = {}
+    this.options = options;
   },
   setFilter: function(filter) {
     if (_.any(filter)) {
