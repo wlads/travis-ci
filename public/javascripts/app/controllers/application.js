@@ -119,7 +119,9 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     window._gaq.push(['_trackPageview']);
   },
   updateRepositories: function(data) {
-    this.repositories.update(data); 
+    this.eachRepositoryCollection(function(collection) {
+      collection.update(data);
+    });
   },
   eachRepositoryCollection: function(callback) {
     _.each(_.values(this.repositories), callback, this);
