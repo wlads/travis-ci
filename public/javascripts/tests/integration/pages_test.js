@@ -20,7 +20,7 @@ var HISTORY = {
 };
 
 var expectRepositoryView = function(options) {
-  waitsFor(repositoriesFetched());
+  waitsFor(recentRepositoriesFetched());
   waitsFor(tabRendered(options.tab));
 
   var repositories, repository, position;

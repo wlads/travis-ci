@@ -44,8 +44,8 @@ describe('Events:', function() {
     describe('build:started for an existing repository', function() {
       beforeEach(function() {
         goTo('/');
-        waitsFor(repositoriesFetched());
-        runs(function() { Travis.app.repositories.get(2).builds.fetch(); }); // required so we can assert the new build was added, because the fixtures don't contain it
+        waitsFor(recentRepositoriesFetched());
+        runs(function() { Travis.app.repositories.recent.get(2).builds.fetch(); }); // required so we can assert the new build was added, because the fixtures don't contain it
 
         trigger('build:queued', EVENT_PAYLOADS['build:queued:1']);
         trigger('build:started', EVENT_PAYLOADS['build:started:1']);
@@ -60,7 +60,7 @@ describe('Events:', function() {
       });
 
       it('adds the build to the repository builds collection', function() {
-        var repository = Travis.app.repositories.get(2);
+        var repository = Travis.app.repositories.recent.get(2);
         var build = repository.builds.get(10);
         expect(build.get('number')).toEqual(2);
       });
@@ -82,7 +82,7 @@ describe('Events:', function() {
       });
 
       it('adds the repository to the repositories collection and adds build to its builds collection', function() {
-        var repository = Travis.app.repositories.get(3);
+        var repository = Travis.app.repositories.recent.get(3);
         var build = repository.builds.get(11);
         expect(repository.get('slug')).toEqual('travis-ci/travis-ci')
         expect(build.get('number')).toEqual(1);
@@ -127,7 +127,7 @@ describe('Events:', function() {
     describe('build:log for the same repository', function() {
       beforeEach(function() {
         goTo('josevalim/enginex');
-        waitsFor(repositoriesFetched());
+        waitsFor(recentRepositoriesFetched());
         trigger('build:started', EVENT_PAYLOADS['build:started:1']);
         trigger('build:log', EVENT_PAYLOADS['build:log:1']);
       });
@@ -140,7 +140,7 @@ describe('Events:', function() {
     describe('build:log for a different repository', function() {
       beforeEach(function() {
         goTo('/');
-        waitsFor(repositoriesFetched());
+        waitsFor(recentRepositoriesFetched());
         trigger('build:started', EVENT_PAYLOADS['build:started:2']);
         trigger('build:log', EVENT_PAYLOADS['build:log:1']);
       });
@@ -153,7 +153,7 @@ describe('Events:', function() {
     describe('build:finished for a normal build', function() {
       beforeEach(function() {
         goTo('josevalim/enginex');
-        waitsFor(repositoriesFetched());
+        waitsFor(recentRepositoriesFetched());
         runs(function() {
           expect('#repositories li:nth-child(2)').toListRepository({ slug: 'josevalim/enginex', build: 1, selected: true, color: 'red', finished_at: 'a day ago', duration: '20 sec' });
           expect($('#tab_build')).toShowBuildSummary({ build: 1, commit: '565294c', committer: 'Jose Valim', color: 'red', finished_at: 'a day ago', duration: '20 sec' });
@@ -174,7 +174,7 @@ describe('Events:', function() {
     describe('build:finished for a matrix build', function() {
       beforeEach(function() {
         goTo('/');
-        waitsFor(repositoriesFetched());
+        waitsFor(recentRepositoriesFetched());
         runs(function() {
           expect('#repositories li:nth-child(1)').toListRepository({ slug: 'svenfuchs/minimal', build: 3, selected: true, color: null, finished_at: '-', duration: '4 hrs 30 sec' });
           expect($('#tab_build')).toShowBuildSummary({ build: 3, commit: 'add057e (master)', committer: 'Sven Fuchs', color: null, finished_at: '-', duration: '4 hrs 30 sec' });
@@ -276,7 +276,7 @@ describe('Events:', function() {
     describe('for the same repository and (normal) build', function() {
       beforeEach(function() {
         goTo('josevalim/enginex');
-        waitsFor(repositoriesFetched());
+        waitsFor(recentRepositoriesFetched());
         trigger('build:started', EVENT_PAYLOADS['build:started:1']);
         goTo('/josevalim/enginex/builds/10');
       });
@@ -309,7 +309,7 @@ describe('Events:', function() {
     describe('for the same repository and (matrix) parent build', function() {
       beforeEach(function() {
         goTo('/svenfuchs/minimal/builds/3');
-        waitsFor(repositoriesFetched());
+        waitsFor(recentRepositoriesFetched());
       });
 
       describe('build:log for the child build', function() {
@@ -318,7 +318,7 @@ describe('Events:', function() {
         });
 
         it('does not remove the sibling builds from the matrix table', function() {
-          expect(Travis.app.repositories.get(1).builds.get(3).matrix.length).toEqual(4)
+          expect(Travis.app.repositories.recent.get(1).builds.get(3).matrix.length).toEqual(4)
           expect($('#tab_build #matrix tbody tr').length).toEqual(4);
         });
       });
@@ -355,7 +355,7 @@ describe('Events:', function() {
     describe('for a different build', function() {
       beforeEach(function() {
         goTo('/josevalim/enginex/builds/8');
-        waitsFor(repositoriesFetched());
+        waitsFor(recentRepositoriesFetched());
         trigger('build:started', EVENT_PAYLOADS['build:started:1']);
       });
 
@@ -389,7 +389,7 @@ describe('Events:', function() {
     describe('for a different repository and build', function() {
       beforeEach(function() {
         goTo('/svenfuchs/minimal/builds/2');
-        waitsFor(repositoriesFetched());
+        waitsFor(recentRepositoriesFetched());
         trigger('build:started', EVENT_PAYLOADS['build:started:1']);
       });
 

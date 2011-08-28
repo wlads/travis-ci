@@ -1,4 +1,4 @@
-var repositoriesFetched       = function(count) { return function() { return Travis.app.repositories.recent.fetched; }; };
+var recentRepositoriesFetched       = function(count) { return function() { return Travis.app.repositories.recent.fetched; }; };
 var buildsFetched        = function(repository) { return function() { return repository.builds.fetched; } }
 var repositoriesListPopulated = function(count) { return function() { return $('#repositories .repository').length >= (count || 1); }; };
 var repositoryRendered        = function()      { return function() { return $('#main .repository h3').text() != ''; }; };

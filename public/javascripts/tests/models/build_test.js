@@ -2,7 +2,7 @@ describe('Builds', function() {
   beforeEach(function() {
     startApp();
     goTo('/');
-    runsWhen(repositoriesFetched(), function() {
+    runsWhen(recentRepositoriesFetched(), function() {
       expect(Travis.app.repositories.recent).not.toBeEmpty();
     });
   });
