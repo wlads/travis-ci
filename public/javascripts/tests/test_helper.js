@@ -78,7 +78,7 @@ var startApp = function() {
 var stopApp = function() {
   restoreElements();
   if(Travis.app) {
-    Travis.app.repositoriesList.detach();
+    Travis.app.repositoryLists.detach();
     Travis.app.repositoryShow.detach();
   }
   delete Travis.app;

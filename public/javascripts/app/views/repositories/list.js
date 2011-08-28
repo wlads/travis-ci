@@ -48,8 +48,15 @@ Travis.Views.Repositories.Lists = Backbone.View.extend({
   },
   attachTo: function(collections) {
     _.each(_.keys(collections), function(name) {
-      this.tabs[name].attachTo(collections[name]);
+      if (_.include(_.keys(this.tabs), name)) {
+        this.tabs[name].attachTo(collections[name]);
+      }
     }, this);
+  },
+  detach: function() {
+    _.each(this.tabs, function(tab) {
+      tab.detach();
+    });
   },
   activateTab: function(name) {
     _.each(this.tabs, function(tab) { if(tab.name != name) tab.deactivate(); });

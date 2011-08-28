@@ -5,7 +5,9 @@ var Travis = {
     Travis.templates = JST;
     Backbone.history = new Backbone.History;
     Travis.app = new Travis.Controllers.Application();
-    Travis.app.currentUser = currentUser;
+    if (typeof currentUser != 'undefined') {
+      Travis.app.currentUser = currentUser;
+    }
     Travis.app.run();
   },
   trigger: function(event, data) {
