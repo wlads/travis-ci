@@ -57,7 +57,7 @@ $(document).ready(function() {
   }
 
   $('#search input').keyup(_.debounce(function(e) {
-    Travis.app.repositories.setFilter($(this).val()).fetch()
+    Travis.app.repositories.recent.setFilter($(this).val()).fetch()
   }, 100));
 
   function toggle_slider() {

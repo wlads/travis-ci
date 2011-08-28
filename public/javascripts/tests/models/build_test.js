@@ -3,7 +3,7 @@ describe('Builds', function() {
     startApp();
     goTo('/');
     runsWhen(repositoriesFetched(), function() {
-      expect(Travis.app.repositories).not.toBeEmpty();
+      expect(Travis.app.repositories.recent).not.toBeEmpty();
     });
   });
 
@@ -28,7 +28,7 @@ describe('Builds', function() {
   });
   describe('getOrFetch given a child build id', function() {
     it('works', function() {
-      var builds = Travis.app.repositories.get(1).builds;
+      var builds = Travis.app.repositories.recent.get(1).builds;
       builds.remove(3);
       expect(builds.pluck('id')).toEqual([]);
 
@@ -41,7 +41,7 @@ describe('Builds', function() {
   });
 
   it('adds a normal build to the global Travis.app.builds collection', function() {
-    var build = Travis.app.repositories.get('1').builds.first();
+    var build = Travis.app.repositories.recent.get('1').builds.first();
     expect(Travis.app.builds).not.toBeEmpty();
     expect(Travis.app.builds.get(build.id)).toEqual(build);
   });

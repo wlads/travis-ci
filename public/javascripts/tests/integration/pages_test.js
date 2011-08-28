@@ -26,7 +26,7 @@ var expectRepositoryView = function(options) {
   var repositories, repository, position;
 
   runs(function() {
-    repositories = Travis.app.repositories;
+    repositories = Travis.app.repositories.recent;
     repository = repositories.getBy({ slug: options.slug });
     position = repositories.length - repositories.models.indexOf(repository);
 

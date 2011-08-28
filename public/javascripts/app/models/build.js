@@ -6,7 +6,7 @@ Travis.Models.Build = Travis.Models.Base.extend({
 
     this.repository = this.repository;
     if(!this.repository && this.collection) this.repository = this.collection.repository;
-    if(!this.repository && Travis.app) this.repository = Travis.app.repositories.get(this.get('repository_id'));
+    if(!this.repository && Travis.app) this.repository = Travis.app.repositories.recent.get(this.get('repository_id'));
 
     if(this.attributes._log) {
       this.appendLog(this.attributes._log);
