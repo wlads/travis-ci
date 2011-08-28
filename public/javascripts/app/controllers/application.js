@@ -16,22 +16,23 @@ Travis.Controllers.Application = Backbone.Controller.extend({
   },
 
   run: function() {
-    this.repositories = new Travis.Collections.Repositories();
-    this.builds       = new Travis.Collections.AllBuilds();
-    this.jobs         = new Travis.Collections.Jobs([], { queue: 'builds' });
-    this.jobsRails    = new Travis.Collections.Jobs([], { queue: 'rails' });
-    this.workers      = new Travis.Collections.Workers();
+    this.repositories   = new Travis.Collections.Repositories();
+    this.myRepositories = new Travis.Collections.Repositories([], { owner_name: 'svenfuchs' });
+    this.builds         = new Travis.Collections.AllBuilds();
+    this.jobs           = new Travis.Collections.Jobs([], { queue: 'builds' });
+    this.jobsRails      = new Travis.Collections.Jobs([], { queue: 'rails' });
+    this.workers        = new Travis.Collections.Workers();
 
-    this.repositoriesList = new Travis.Views.Repositories.List();
-    this.repositoryShow   = new Travis.Views.Repository.Show({ parent: this });
-    this.workersView      = new Travis.Views.Workers.List();
-    this.jobsView         = new Travis.Views.Jobs.List({ queue: 'builds' });
-    this.jobsRailsView    = new Travis.Views.Jobs.List({ queue: 'rails' });
+    this.repositoryLists = new Travis.Views.Repositories.Lists();
+    this.repositoryShow  = new Travis.Views.Repository.Show({ parent: this });
+    this.workersView     = new Travis.Views.Workers.List();
+    this.jobsView        = new Travis.Views.Jobs.List({ queue: 'builds' });
+    this.jobsRailsView   = new Travis.Views.Jobs.List({ queue: 'rails' });
 
-    $('#left #tab_recent .tab').append(this.repositoriesList.render().el);
+    $('#repository-lists').append(this.repositoryLists.render().el);
     $('#main').append(this.repositoryShow.render().el);
 
-    this.repositoriesList.attachTo(this.repositories);
+    this.repositoryLists.attachTo('recent', this.repositories);
     this.repositoryShow.attachTo(this.repositories)
     this.workersView.attachTo(this.workers)
     this.jobsView.attachTo(this.jobs)
@@ -55,9 +56,19 @@ Travis.Controllers.Application = Backbone.Controller.extend({
   recent: function() {
     this.reset();
     this.followBuilds = true;
+    this.repositoryLists.activateTab('recent');
     this.selectTab('current');
     this.repositories.whenFetched(_.bind(function () {
       this.repositories.selectLast();
+
+    }, this));
+  },
+  mine: function() {
+    this.reset();
+    this.followBuilds = true;
+    this.selectTab('current');
+    this.myRepositories.whenFetched(_.bind(function () {
+      this.myRepositories.selectLast();
 
     }, this));
   },
