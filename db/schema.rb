@@ -98,6 +98,7 @@ ActiveRecord::Schema.define(:version => 20110805030147) do
     t.integer  "commit_id"
     t.integer  "owner_id"
     t.string   "owner_type"
+    t.string   "queue"
     t.string   "type"
     t.string   "state"
     t.string   "number"
