@@ -18,8 +18,10 @@ Travis.Controllers.Application = Backbone.Controller.extend({
   },
 
   run: function() {
-    this.repositories   = new Travis.Collections.Repositories();
-    this.myRepositories = new Travis.Collections.Repositories([], { owner_name: this.currentUser });
+    this.repositories   = {
+      recent: new Travis.Collections.Repositories(),
+      mine:   new Travis.Collections.Repositories([], { owner_name: this.currentUser })
+    };
     this.builds         = new Travis.Collections.AllBuilds();
     this.jobs           = new Travis.Collections.Jobs([], { queue: 'builds' });
     this.jobsRails      = new Travis.Collections.Jobs([], { queue: 'rails' });
@@ -34,13 +36,15 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     $('#repository-lists').append(this.repositoryLists.render().el);
     $('#main').append(this.repositoryShow.render().el);
 
-    this.repositoryLists.attachTo('recent', this.repositories);
-    this.repositoryLists.attachTo('mine', this.myRepositories);
-    this.repositoryShow.attachTo(this.repositories)
+    this.repositoryLists.attachTo(this.repositories);
+    this.repositoryShow.attachTo(this.repositories.recent);
     this.workersView.attachTo(this.workers)
     this.jobsView.attachTo(this.jobs)
     this.jobsRailsView.attachTo(this.jobsRails)
-    this.repositories.bind('select', this.repositorySelected);
+
+    this.eachRepositoryCollection(function (collection) {
+      collection.bind('select', this.repositorySelected);
+    });
 
     this.bind('build:started',    this.buildStarted);
     this.bind('build:finished',   this.buildFinished);
@@ -61,20 +65,14 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     this.followBuilds = true;
     this.repositoryLists.activateTab('recent');
     this.selectTab('current');
-    this.repositories.whenFetched(_.bind(function () {
-      this.repositories.selectLast();
-
-    }, this));
+    this.selectLastRepository();
   },
   mine: function() {
     this.reset();
     this.followBuilds = true;
     this.repositoryLists.activateTab('mine');
     this.selectTab('current');
-    this.myRepositories.whenFetched(_.bind(function () {
-      this.myRepositories.selectLast();
-
-    }, this));
+    this.selectLastRepository();
   },
   repository: function(owner, name, line_number) {
     console.log ("application#repository: ", arguments)
@@ -83,20 +81,14 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     this.startLoading();
     window.params = { owner: owner, name: name, line_number: line_number, action: 'repository' }
     this.selectTab('current');
-    this.repositories.whenFetched(_.bind(function(repositories) {
-      repositories.selectLastBy({ slug: owner + '/' + name });
-
-    }, this));
+    this.selectLastRepositoryBySlug(owner, name);
   },
   repositoryHistory: function(owner, name) {
     console.log ("application#repositoryHistory: ", arguments)
     this.reset();
     this.trackPage();
     this.selectTab('history');
-    this.repositories.whenFetched(_.bind(function(repositories) {
-      repositories.selectLastBy({ slug: owner + '/' + name })
-
-    }, this));
+    this.selectLastRepositoryBySlug(owner, name);
   },
   repositoryBuild: function(owner, name, buildId, line_number) {
     console.log ("application#repositoryBuild: ", arguments)
@@ -106,10 +98,7 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     window.params = { owner: owner, name: name, build_id: buildId, line_number: line_number, action: 'repositoryBuild' }
     this.buildId = parseInt(buildId);
     this.selectTab('build');
-    this.repositories.whenFetched(_.bind(function(repositories) {
-      repositories.selectLastBy({ slug: owner + '/' + name })
-
-    }, this));
+    this.selectLastRepositoryBySlug(owner, name);
   },
 
   // helpers
@@ -131,6 +120,25 @@ Travis.Controllers.Application = Backbone.Controller.extend({
   },
   updateRepositories: function(data) {
     this.repositories.update(data); 
+  },
+  eachRepositoryCollection: function(callback) {
+    _.each(_.values(this.repositories), callback, this);
+  },
+  selectLastRepositoryBySlug: function(owner, name) {
+    this.eachRepositoryCollection(function(collection) {
+      collection.whenFetched(_.bind(function(repositories) {
+        repositories.selectLastBy({ slug: owner + '/' + name })
+
+      }, this));
+    });
+  },
+  selectLastRepository: function() {
+    this.eachRepositoryCollection(function(collection) {
+      collection.whenFetched(_.bind(function(repositories) {
+        repositories.selectLast();
+
+      }, this));
+    });
   },
 
   // internal events
@@ -161,11 +169,13 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     this.removeJob(data);
     this.updateRepositories(data);
 
-    if((this.followBuilds || this.tab == 'current' && this.repositories.selected().get('slug') == data.slug) && !this.buildId && !data.build.parent_id) {
-      var repository = this.repositories.get(data.id);
-      if(!repository.selected) repository.select();
-      repository.builds.select(data.build.id);
-    }
+    this.eachRepositoryCollection(function (collection) {
+      if((this.followBuilds || this.tab == 'current' && collection.selected().get('slug') == data.slug) && !this.buildId && !data.build.parent_id) {
+        var repository = collection.get(data.id);
+        if(!repository.selected) repository.select();
+        repository.builds.select(data.build.id);
+      }
+    });
   },
   buildConfigured: function(data) {
     console.log ("application#buildConfigured: ", arguments)
