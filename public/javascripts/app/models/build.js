@@ -109,10 +109,6 @@ Travis.Collections.Builds = Travis.Collections.Base.extend({
     _.extend(this, options);
     this.args = this.args || {};
   },
-  _add: function(model, options) {
-    return Travis.Collections.Base.prototype._add.apply(this, arguments);
-    // if(Travis.app) Travis.app.builds._add(model);
-  },
   update: function(attributes) {
     if(attributes) {
       var build = this.get(attributes.id);
@@ -125,6 +121,7 @@ Travis.Collections.Builds = Travis.Collections.Base.extend({
     }
     return this.args.page || 1;
   },
+  // TODO: Create a URL builder
   url: function() {
     return '/repositories/' + this.repository.id + '/builds' + Utils.queryString(this.args);
   },
@@ -143,15 +140,3 @@ Travis.Collections.Builds = Travis.Collections.Base.extend({
     return parseInt(number) * 100000 - fraction;
   }
 });
-
-Travis.Collections.AllBuilds = Travis.Collections.Builds.extend({
-  _add: function(model, options) {
-    var cid = model.cid;
-    var collection = model.collection;
-    Travis.Collections.Base.prototype._add.apply(this, arguments);
-    model.collection = collection;
-    model.cid = cid;
-    return this;
-  }
-});
-

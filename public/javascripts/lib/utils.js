@@ -154,6 +154,7 @@ function trace() {
 }
 
 window._console = console;
+window.__DEBUG__ = true;
 /*
  * In order to use old (default) behavior of console, please use __DEBUG__ in URL hash, or __DEBUG__ global variable
  *   when hash is not accessible

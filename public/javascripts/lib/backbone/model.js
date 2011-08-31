@@ -2,22 +2,12 @@ Travis.Models.Base = Backbone.Model.extend({
   selected: false,
   initialize: function() {
     Backbone.Model.prototype.initialize.apply(this, arguments);
-    _.bindAll(this, 'select', 'deselect');
   },
-  select: function() {
-    this.collection.deselect();
-    this.selected = true;
-    this.trigger('select', this); // Backbone will make this trigger on the collection as well
-  },
-  deselect: function() {
-    this.selected = false;
-    this.trigger('deselect', this);
-  },
-
   fetch : function(options) {
     options || (options = {});
     var model = this;
     var success = function(resp) {
+      model.trigger('change')
       if (!model.set(model.parse(resp), options)) return false;
       if (options.success) options.success(model, resp);
     };
@@ -45,7 +35,7 @@ Travis.sync = function(method, model, success, error, options) {
     };
 
     if (options && options.async == false) {
-      params.async = false
+      params.async = false;
     }
 
     // Make the request.

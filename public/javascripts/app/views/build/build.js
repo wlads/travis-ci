@@ -1,50 +1,23 @@
 Travis.Views.Build.Build = Backbone.View.extend({
   initialize: function() {
-    _.bindAll(this, 'attachTo', 'buildSelected', 'buildConfigured', 'updateTab', '_update');
+    _.bindAll(this, 'attachTo', 'buildSelected', 'buildConfigured', 'updateTab', '_update', 'render');
     _.extend(this, this.options);
 
     this.el = $('<div></div>');
-    // if(this.repository) {
-      // this.render();
-      // this.attachTo(this.repository);
-    // }
+    this.repository.bind('change', this.render)
+
   },
   render: function() {
-    if(this.repository) this._update();
+    this.el.empty();
+    this._renderSummary();
+    if(this.build.matrix.length > 1) {
+        this._renderMatrix();
+    } else {
+      this._renderLog();
+    }
+
+    this.view.append(this.el)
     return this;
-  },
-  detach: function() {
-    if(this.repository) {
-      this.repository.builds.unbind('select', this.buildSelected);
-      delete this.repository;
-      delete this.build;
-    }
-  },
-  attachTo: function(repository) {
-    this.detach();
-    this.repository = repository;
-    this.repository.builds.bind('select', this.buildSelected);
-    this._update();
-    this.updateTab();
-  },
-  detachFromBuild: function() {
-    if(this.build) {
-      this.build.unbind('configured', this.buildConfigured);
-    }
-  },
-  attachToBuild: function(build) {
-    this.build = build;
-    this.detachFromBuild();
-    this.build.bind('configured', this.buildConfigured);
-  },
-  buildSelected: function(build) {
-    this.attachToBuild(build);
-    this._update();
-    this.updateTab();
-  },
-  buildConfigured: function(build) {
-    this.build = build;
-    this._update();
   },
   updateTab: function() {
     if(this.build) {
@@ -57,17 +30,10 @@ Travis.Views.Build.Build = Backbone.View.extend({
   },
   _update: function() {
     if(this.build) {
-      this.el.empty();
-      this._renderSummary();
-      if(this.build.matrix) {
-          this._renderMatrix();
-      } else {
-        this._renderLog();
-      }
     }
   },
   _renderSummary: function() {
-    this.el.append(new Travis.Views.Build.Summary({ model: this.build, parent: this }).render().el);
+    this.el.append(new Travis.Views.Build.Summary({ model: this.build, parent: this.repository }).render().el);
   },
   _renderLog: function() {
     this.log = new Travis.Views.Build.Log({ model: this.build, parent: this })

@@ -11,7 +11,7 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     '!/:owner/:name/builds/:id':                 'repositoryBuild'
   },
   _queues: [ 'builds', 'rails'],
-  before_filter: [ 'reset', 'trackPage', 'startLoading' ],
+  before_filter: [ 'reset', 'trackPage' ],
   initialize: function() {
     _.bindAll(this, 'recent', 'byUser', 'repository', 'repositoryHistory', 'repositoryBuild', 'repositoryShow', 'repositorySelected', 'buildQueued', 'buildStarted', 'buildLogged', 'buildFinished', 'buildRemoved', 'route');
   },
@@ -65,17 +65,21 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     console.log ("application#repository: ", arguments);
     window.params = { owner: owner, name: name, line_number: line_number, action: 'repository' };
 
-    new Travis.Models.Repository({ slug: owner + '/' + name }).fetch({ success: _.bind(function(repository) {
-      $('#main').html(new Travis.Views.Build.Build({ repository: repository, build: repository.builds.first()  }).render().el);
-      this.stopLoading();
-    }, this)});
+    // $("#main").html( new Travis.Views.Repository.Tabs().render().el)
+    var repository = new Travis.Models.Repository({ slug: owner + '/' + name })
+    new Travis.Views.Build.Build({ repository: repository, build: repository.builds.first(), view: $("#main")  })
+    repository.fetch()
+      // .fetch({ success: _.bind(function(repository) {
+      // $('#main').append(.render().el)
+      // this.stopLoading();
+    // }, this)});
   },
   repositoryHistory: function(owner, name) {
     console.log ("application#repositoryHistory: ", arguments);
 
     new Travis.Models.Repository({ slug: owner + '/' + name }).fetch({ success: _.bind(function(repository) {
-      repository.builds.fetch({ success: _.bind(function(builds) { 
-        $("#main").html(new Travis.Views.Build.History.Table({ builds: builds, repository: repository }).render().el);
+      repository.builds.fetch({ success: _.bind(function(builds) {
+        $("#main").append(new Travis.Views.Build.History.Table({ builds: builds, repository: repository }).render().el);
         this.stopLoading();
       }, this) });
 
@@ -86,8 +90,8 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     window.params = { owner: owner, name: name, build_id: buildId, line_number: line_number, action: 'repositoryBuild' };
 
     new Travis.Models.Repository({ slug: owner + '/' + name }).fetch({ success: _.bind(function(repository) {
-      repository.builds.fetch({ success: _.bind(function(builds) { 
-        $("#main").html(new Travis.Views.Build.Build({ build: builds.get(parseInt(buildId)), repository: repository }).render().el);
+      repository.builds.fetch({ success: _.bind(function(builds) {
+        $("#main").append(new Travis.Views.Build.Build({ build: builds.get(parseInt(buildId)), repository: repository }).render().el);
         this.stopLoading();
       }, this) });
     }, this)});
@@ -111,23 +115,6 @@ Travis.Controllers.Application = Backbone.Controller.extend({
     window._gaq.push(['_trackPageview']);
   },
 
-
-  // internal events
-  repositorySelected: function(repository) {
-    repository.builds.bind('finish_get_or_fetch', function() { this.stopLoading(); }.bind(this));
-
-    switch(this.tab) {
-      case 'current':
-        repository.builds.select(repository.get('last_build_id'));
-        break;
-      case 'build':
-        repository.builds.select(this.buildId);
-        break;
-      case 'history':
-        if(!repository.builds.fetched) repository.builds.fetch();
-        break;
-    };
-  },
 
   // external events
 
