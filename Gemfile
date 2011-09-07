@@ -47,12 +47,13 @@ group :assets do
 end
 
 group :test do
-  gem 'capybara',        '~> 1.1.0'
+  gem 'capybara',        '~> 1.0.0'
   gem 'database_cleaner'
   gem 'factory_girl',    '~> 2.0.3'
   gem 'mocha'
   gem 'fakeredis',       '~> 0.2.0'
   gem 'webmock'
+  gem 'capybara-webkit', '~> 0.6.1'
 
   platforms :ruby_18 do
     gem 'minitest'

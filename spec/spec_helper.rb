@@ -21,8 +21,6 @@ def configure
   load_all 'spec/support/**/*.rb'
 
   RSpec.configure do |c|
-    c.filter_run_excluding :js => true if ENV['CI']
-
     c.mock_with :mocha
 
     Support.constants.each do |constant|
@@ -51,6 +49,9 @@ def configure
     c.after :each do
       DatabaseCleaner.clean
     end
+
+    # set javascript driver for capybara
+    Capybara.javascript_driver = :webkit
   end
 
   WebMock.disable_net_connect!(:allow_localhost => true)

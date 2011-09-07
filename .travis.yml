@@ -1,7 +1,8 @@
 bundler_args: "--without development"
 before_script:
   - "cp config/database.example.yml config/database.yml"
-script: "bundle exec rake test:ci"
+  - "sh -e /etc/init.d/xvfb start"
+script: "DISPLAY=:99.0 bundle exec rake test:ci"
 rvm:
   - 1.9.2
   - 1.9.3
