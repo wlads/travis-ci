@@ -48,33 +48,33 @@ Travis.Repository = Travis.Record.extend(Travis.Helpers.Common, {
     return $.compact(['repository', this.get('color'), this.get('selected') ? 'selected' : null]).join(' ');
   }.property('color', 'selected').cacheable(),
 
-  urlCurrent: function() {
-    return '#!/' + this.getPath('slug');
-  }.property('slug').cacheable(),
+  // urlCurrent: function() {
+  //   return '#!/' + this.getPath('slug');
+  // }.property('slug').cacheable(),
 
-  urlBuilds: function() {
-    return '#!/' + this.get('slug') + '/builds';
-  }.property('slug').cacheable(),
+  // urlBuilds: function() {
+  //   return '#!/' + this.get('slug') + '/builds';
+  // }.property('slug').cacheable(),
 
-  urlLastBuild: function() {
-    return '#!/' + this.get('slug') + '/builds/' + this.get('last_build_id');
-  }.property('last_build_id').cacheable(),
+  // urlLastBuild: function() {
+  //   return '#!/' + this.get('slug') + '/builds/' + this.get('last_build_id');
+  // }.property('last_build_id').cacheable(),
 
-  urlGithub: function() {
-    return 'http://github.com/' + this.get('slug');
-  }.property('slug').cacheable(),
+  // urlGithub: function() {
+  //   return 'http://github.com/' + this.get('slug');
+  // }.property('slug').cacheable(),
 
-  urlGithubWatchers: function() {
-    return 'http://github.com/' + this.get('slug') + '/watchers';
-  }.property('slug').cacheable(),
+  // urlGithubWatchers: function() {
+  //   return 'http://github.com/' + this.get('slug') + '/watchers';
+  // }.property('slug').cacheable(),
 
-  urlGithubNetwork: function() {
-    return 'http://github.com/' + this.get('slug') + '/network';
-  }.property('slug').cacheable(),
+  // urlGithubNetwork: function() {
+  //   return 'http://github.com/' + this.get('slug') + '/network';
+  // }.property('slug').cacheable(),
 
-  urlGithubAdmin: function() {
-    return this.get('url') + '/admin/hooks#travis_minibucket';
-  }.property('slug').cacheable(),
+  // urlGithubAdmin: function() {
+  //   return this.get('url') + '/admin/hooks#travis_minibucket';
+  // }.property('slug').cacheable(),
 });
 
 Travis.Repository.reopenClass({

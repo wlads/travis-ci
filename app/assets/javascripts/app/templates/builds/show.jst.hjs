@@ -1,45 +1,45 @@
-<div {{bindAttr class="content.color"}}>
+<div {{bindAttr class="build.color"}}>
   <dl class="summary clearfix">
     <div class="left">
       <dt>Build</dt>
 
-      <dd class="number"><a {{bindAttr href="content.url"}}>{{content.number}}</a></dd>
+      <dd class="number"><a {{bindAttr href="urlBuild"}}>{{build.number}}</a></dd>
       <dt class="finished_at_label">Finished</dt>
-      <dd class="finished_at timeago" {{bindAttr title="content.finished_at"}}>{{content.formattedFinishedAt}}</dd>
+      <dd class="finished_at timeago" {{bindAttr title="build.finished_at"}}>{{formattedFinishedAt}}</dd>
       <dt>Duration</dt>
-      <dd class="duration" {{bindAttr title="content.started_at"}}>{{content.formattedDuration}}</dd>
+      <dd class="duration" {{bindAttr title="build.started_at"}}>{{formattedDuration}}</dd>
     </div>
 
     <div class="right">
       <dt>Commit</dt>
-      <dd class="commit-hash"><a {{bindAttr href="content.urlGithubCommit"}}>{{content.formattedCommit}}</a></dd>
-      {{#if content.compare_url}}
+      <dd class="commit-hash"><a {{bindAttr href="urlGithubCommit"}}>{{formattedCommit}}</a></dd>
+      {{#if build.compare_url}}
         <dt>Compare</dt>
-        <dd class="compare_view"><a {{bindAttr href="content.compare_url"}}>{{content.formattedCompareUrl}}</a></dd>
+        <dd class="compare_view"><a {{bindAttr href="build.compare_url"}}>{{formattedCompareUrl}}</a></dd>
       {{/if}}
-      {{#if content.author_name}}
+      {{#if build.author_name}}
         <dt>Author</dt>
-        <dd class="author"><a {{bindAttr href="content.urlAuthor"}}>{{content.author_name}}</a></dd>
+        <dd class="author"><a {{bindAttr href="urlAuthor"}}>{{build.author_name}}</a></dd>
       {{/if}}
-      {{#if content.committer_name}}
+      {{#if build.committer_name}}
         <dt>Committer</dt>
-        <dd class="committer"><a {{bindAttr href="content.urlCommitter"}}>{{content.committer_name}}</a></dd>
+        <dd class="committer"><a {{bindAttr href="urlCommitter"}}>{{build.committer_name}}</a></dd>
       {{/if}}
     </div>
 
     <dt>Message</dt>
-    <dd class="commit-message">{{content.message}}</dd>
+    <dd class="commit-message">{{build.message}}</dd>
 
-    {{#if content.isMatrix}}
+    {{#if build.isMatrix}}
     {{else}}
       <dt>Config</dt>
-      <dd class="config">{{content.formattedConfig}}</dd>
+      <dd class="config">{{formattedConfig}}</dd>
     {{/if}}
   </dl>
 
-  {{#if content.isMatrix}}
-    {{view Travis.View templateName="app/templates/jobs/list" repositoryBinding="repository" contentBinding="content"}}
+  {{#if build.isMatrix}}
+    {{view Travis.View templateName="app/templates/jobs/list" repositoryBinding="repository" buildBinding="build"}}
   {{else}}
-    <pre class="log">{{{content.matrix.firstObject.formattedLog}}}</pre>
+    <pre class="log">{{{build.matrix.firstObject.formattedLog}}}</pre>
   {{/if}}
 </div>

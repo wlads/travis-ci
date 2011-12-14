@@ -17,13 +17,15 @@ Travis.Controllers.Repositories.Show = SC.Object.extend({
 
   init: function() {
     this.tabs.parent = this;
-    this.view = Travis.View.create({
+
+    this.view = Travis.Views.Repository.create({
       controller: this,
       repositoryBinding: 'controller.repository',
       buildBinding: 'controller.build',
       jobBinding: 'controller.job',
       templateName: 'app/templates/repositories/show'
     });
+
     this.view.appendTo('#main');
   },
 

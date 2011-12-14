@@ -54,53 +54,52 @@ Travis.Build = Travis.Record.extend(Travis.Helpers.Common, {
 
   // VIEW HELPERS
 
-  formattedDuration: function() {
-    var duration = this.get('duration');
-    if(!duration) duration = this.durationFrom(this.get('started_at'), this.get('finished_at'));
-    return this.readableTime(duration);
-  }.property('duration', 'started_at', 'finished_at'),
+  // formattedDuration: function() {
+  //   var duration = this.get('duration');
+  //   if(!duration) duration = this.durationFrom(this.get('started_at'), this.get('finished_at'));
+  //   return this.readableTime(duration);
+  // }.property('duration', 'started_at', 'finished_at'),
 
-  formattedFinishedAt: function() {
-    return this.timeAgoInWords(this.get('finished_at')) || '-';
-  }.property('finished_at').cacheable(),
+  // formattedFinishedAt: function() {
+  //   return this.timeAgoInWords(this.get('finished_at')) || '-';
+  // }.property('finished_at').cacheable(),
 
-  formattedCommit: function() {
-    var branch = this.get('branch');
-    return (this.get('commit') || '').substr(0, 7) + (branch ? ' (%@)'.fmt(branch) : '');
-  }.property('commit', 'branch').cacheable(),
+  // formattedCommit: function() {
+  //   var branch = this.get('branch');
+  //   return (this.get('commit') || '').substr(0, 7) + (branch ? ' (%@)'.fmt(branch) : '');
+  // }.property('commit', 'branch').cacheable(),
 
-  formattedCompareUrl: function() {
-    var parts = (this.get('compare_url') || '').split('/');
-    return parts[parts.length - 1];
-  }.property('compare_url').cacheable(),
+  // formattedCompareUrl: function() {
+  //   var parts = (this.get('compare_url') || '').split('/');
+  //   return parts[parts.length - 1];
+  // }.property('compare_url').cacheable(),
 
-  formattedConfig: function() {
-    var config = $.only(this.get('config'), 'rvm', 'gemfile', 'env', 'otp_release', 'php', 'node_js');
-    var values = $.map(config, function(value, key) { return '%@: %@'.fmt($.camelize(key), value.join ? value.join(', ') : value); });
-    return values.length == 0 ? '-' : values.join(', ');
-  }.property('config').cacheable(),
+  // formattedConfig: function() {
+  //   var config = $.only(this.get('config'), 'rvm', 'gemfile', 'env', 'otp_release', 'php', 'node_js');
+  //   var values = $.map(config, function(value, key) { return '%@: %@'.fmt($.camelize(key), value.join ? value.join(', ') : value); });
+  //   return values.length == 0 ? '-' : values.join(', ');
+  // }.property('config').cacheable(),
 
-  formattedMatrixHeaders: function() {
-    var keys = $.keys($.only(this.get('config'), 'rvm', 'gemfile', 'env', 'otp_release', 'php', 'node_js'));
-    return $.map(['Job', 'Duration', 'Finished'].concat(keys), function(key) { return $.camelize(key) });
-  }.property('config').cacheable(),
+  // formattedMatrixHeaders: function() {
+  //   var keys = $.keys($.only(this.get('config'), 'rvm', 'gemfile', 'env', 'otp_release', 'php', 'node_js'));
+  //   return $.map(['Job', 'Duration', 'Finished'].concat(keys), function(key) { return $.camelize(key) });
+  // }.property('config').cacheable(),
 
-  url: function() {
-    return '#!/' + this.getPath('repository.slug') + '/builds/' + this.get('id');
-  }.property('repository.status', 'id'),
+  // url: function() {
+  //   return '#!/' + this.getPath('repository.slug') + '/builds/' + this.get('id');
+  // }.property('repository.status', 'id'),
 
-  urlAuthor: function() {
-    this.get('authorEmail')
-    return 'mailto:' + this.get('authorEmail');
-  }.property('author_email').cacheable(),
+  // urlAuthor: function() {
+  //   return 'mailto:' + this.get('authorEmail');
+  // }.property('author_email').cacheable(),
 
-  urlCommitter: function() {
-    return 'mailto:' + this.get('committerEmail');
-  }.property('committer_email').cacheable(),
+  // urlCommitter: function() {
+  //   return 'mailto:' + this.get('committerEmail');
+  // }.property('committer_email').cacheable(),
 
-  urlGithubCommit: function() {
-    return 'http://github.com/' + this.getPath('repository.slug') + '/commit/' + this.get('commit');
-  }.property('repository.slug', 'commit').cacheable(),
+  // urlGithubCommit: function() {
+  //   return 'http://github.com/' + this.getPath('repository.slug') + '/commit/' + this.get('commit');
+  // }.property('repository.slug', 'commit').cacheable(),
 });
 
 Travis.Build.reopenClass({

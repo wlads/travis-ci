@@ -6,10 +6,10 @@ Travis.Controllers.Builds.Show = SC.Object.extend({
     SC.run.later(this.updateTimes.bind(this), Travis.UPDATE_TIMES_INTERVAL);
     var self = this;
 
-    this.view = Travis.View.create({
+    this.view = Travis.Views.Build.create({
       controller: this,
       repositoryBinding: 'controller.repository',
-      contentBinding: 'controller.build',
+      buildBinding: 'controller.build',
       jobsBinding: 'controller.jobs',
       templateName: 'app/templates/builds/show',
     });
