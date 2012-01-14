@@ -28,7 +28,7 @@
     </div>
 
     <dt>Message</dt>
-    <dd class="commit-message">{{content.message}}</dd>
+    <dd class="commit-message">{{{content.formattedMessage}}}</dd>
 
     {{#if content.isMatrix}}
     {{else}}
@@ -38,7 +38,7 @@
   </dl>
 
   {{#if content.isMatrix}}
-    {{view Travis.View templateName="app/templates/jobs/list" repositoryBinding="repository" contentBinding="content"}}
+    {{view Ember.View templateName="app/templates/jobs/list" repositoryBinding="repository" contentBinding="content"}}
   {{else}}
     <pre class="log">{{{content.matrix.firstObject.formattedLog}}}</pre>
   {{/if}}

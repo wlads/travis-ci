@@ -3,7 +3,8 @@
  * and any sub-directories. You're free to add application-wide styles to this file and they'll appear at
  * the top of the compiled file, but it's generally better to create a new file per style scope.
  *= require_self
- *= require_tree .
+ *= require jasmine
+ *= require jquery.tipsy
 */
 
 @import "mixins.scss";
@@ -395,7 +396,7 @@ caption {
   .summary dt,
   .summary dd {
     float: left;
-    height: 25px;
+    min-height: 25px;
     margin: 0;
   }
   .summary dt {
@@ -411,6 +412,10 @@ caption {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .summary .commit-message {
+    white-space: normal;
+    min-width: 0;
   }
   .log {
     clear: left;
@@ -428,6 +433,7 @@ caption {
       position: relative;
       padding: 0 15px 0 50px;
       margin: 0;
+      min-height: 16px;
       &:hover {
         background-color: rgba(255,255,255,.05);
       }
@@ -553,6 +559,12 @@ caption {
 }
 #builds .red .number a {
   color: #C00;
+}
+
+.emoji {
+  vertical-align: middle;
+  width: 20px;
+  height: 20px;
 }
 
 /* main overrides */
@@ -904,6 +916,15 @@ pre::-webkit-scrollbar-thumb:horizontal {
     font-size: 13px;
     h4, p {
       margin-bottom: 4px;
+    }
+  }
+  p.notice {
+    background-color: #a8eb75;
+    padding: 10px;
+
+    small{
+      font-size: 13px;
+      display: block;
     }
   }
   p.tip {

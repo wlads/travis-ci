@@ -78,5 +78,35 @@ describe('Build', function() {
         expect(build.get('log')).toEqual('test-1test-2');
       });
     });
+
+    describe('message', function() {
+      it ('changes emoji to image tags', function() {
+        build.set('message', 'The :cake: is a lie');
+        expect(build.get('formattedMessage')).toEqual('The <img class="emoji" title=":cake:" alt=":cake:" src="/assets/emoji/cake.png"/> is a lie');
+      });
+
+      it ('changes multiple emoji to image tags', function() {
+        build.set('message', 'I :heart: :cake:');
+        expect(build.get('formattedMessage')).toEqual('I <img class="emoji" title=":heart:" alt=":heart:" src="/assets/emoji/heart.png"/> <img class="emoji" title=":cake:" alt=":cake:" src="/assets/emoji/cake.png"/>');
+      });
+
+      it ('does not change message without emoji', function() {
+        build.set('message', 'Issue: This is normal commit :: Something with ActiveSupport::Callbacks: remove __define_runner');
+        expect(build.get('formattedMessage')).toEqual('Issue: This is normal commit :: Something with ActiveSupport::Callbacks: remove __define_runner');
+      });
+
+      it ('trims message to first line in build list for shortMessage', function() {
+        build.set('message', 'First line of commit.\n\nSecond line of commit');
+        expect(build.get('shortMessage')).toEqual('First line of commit.');
+
+        build.set('message', 'First line of commit.\nSecond line of commit');
+        expect(build.get('shortMessage')).toEqual('First line of commit.');
+      });
+
+      it ('shows mulitple lines commits in multiple html lines', function() {
+        build.set('message', 'First line of commit.\n\nSecond line of commit\nThird line.');
+        expect(build.get('formattedMessage')).toEqual('First line of commit.<br/><br/>Second line of commit<br/>Third line.');
+      });
+    });
   });
 });

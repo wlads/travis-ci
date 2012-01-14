@@ -1,12 +1,12 @@
 // __DEBUG__ = true;
-// SC.LOG_BINDINGS = true;
+// Ember.LOG_BINDINGS = true;
 
-var Travis = SC.Application.create({
+var Travis = Ember.Application.create({
   Controllers: { Repositories: {}, Builds: {}, Jobs: {} }, Models: {}, Helpers: {}, Views: {},
 
   UPDATE_TIMES_INTERVAL: 5000,
 
-  store: SC.Store.create().from('Travis.DataSource'),
+  store: Ember.Store.create().from('Travis.DataSource'),
   channels: [],
 
   run: function() {
@@ -24,12 +24,12 @@ var Travis = SC.Application.create({
     this.left   = Travis.Controllers.Repositories.List.create();
     this.right  = Travis.Controllers.Sidebar.create();
 
-    SC.routes.add('!/:owner/:name/jobs/:id/:line_number', function(params) { Travis.main.activate('job', params) });
-    SC.routes.add('!/:owner/:name/jobs/:id',   function(params) { Travis.main.activate('job',     params) });
-    SC.routes.add('!/:owner/:name/builds/:id', function(params) { Travis.main.activate('build',   params) });
-    SC.routes.add('!/:owner/:name/builds',     function(params) { Travis.main.activate('history', params) });
-    SC.routes.add('!/:owner/:name',            function(params) { Travis.main.activate('current', params) });
-    SC.routes.add('',                          function(params) { Travis.main.activate('current', params) });
+    Ember.routes.add('!/:owner/:name/jobs/:id/:line_number', function(params) { Travis.main.activate('job', params) });
+    Ember.routes.add('!/:owner/:name/jobs/:id',   function(params) { Travis.main.activate('job',     params) });
+    Ember.routes.add('!/:owner/:name/builds/:id', function(params) { Travis.main.activate('build',   params) });
+    Ember.routes.add('!/:owner/:name/builds',     function(params) { Travis.main.activate('history', params) });
+    Ember.routes.add('!/:owner/:name',            function(params) { Travis.main.activate('current', params) });
+    Ember.routes.add('',                          function(params) { Travis.main.activate('current', params) });
   },
 
   profile: function() {
@@ -64,12 +64,12 @@ var Travis = SC.Application.create({
 
   initEvents: function() {
     $('.tool-tip').tipsy({ gravity: 'n', fade: true });
-    $('.fold').live('click', function() { $(this).hasClass('open') ? $(this).removeClass('open') : $(this).addClass('open'); });
+    $('.fold').live('click', function() { $(this).toggleClass('open'); });
 
     $('#top .profile').mouseover(function() { $('#top .profile ul').show(); });
     $('#top .profile').mouseout(function() { $('#top .profile ul').hide(); });
 
-    $('#workers .group').live('click', function() { $(this).hasClass('open') ? $(this).removeClass('open') : $(this).addClass('open'); })
+    $('#workers .group').live('click', function() { $(this).toggleClass('open'); })
 
     $('li#tab_recent').click(function () {
       Travis.left.recent();
