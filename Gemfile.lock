@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/travis-ci/travis-core.git
-  revision: 62f750c697eaf82843aa2238aa30534bc9ad5b73
+  revision: fc32d715d0f1f06487cbfdcd0044552a43f04fef
   specs:
     travis-core (0.0.1)
       actionmailer (~> 3.1.2)
@@ -101,8 +101,9 @@ GEM
       fssm (>= 0.2.7)
       sass (~> 3.1)
     crack (0.3.1)
-    css_parser (1.2.5)
+    css_parser (1.2.6)
       addressable
+      rdoc
     daemons (1.1.5)
     data_migrations (0.0.1)
       activerecord
