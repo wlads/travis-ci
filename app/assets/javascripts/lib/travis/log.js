@@ -82,10 +82,14 @@ Travis.Log = {
         // thus maitaining it's state.
         //
         var foldId = 'fold-' + (folds++);
+        console.log('Fold ID: ' + foldId);
         var previousFold = document.getElementById('fold-' + foldId);
+        console.log('previousFold:');
+        console.dir(previousFold);
         var classList = 'fold ' + name;
 
         if (previousFold && previousFold.classList.contains('open')) {
+          console.log('opening a fold');
           classList += ' open';
         }
 
