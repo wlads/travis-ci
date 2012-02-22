@@ -70,9 +70,27 @@ Travis.Log = {
 
   fold: function(log) {
     log = this.unfold(log);
+    var folds = 0;
     $.each(Travis.Log.FOLDS, function(name, pattern) {
       log = log.replace(pattern, function() {
-        return '<div class="fold ' + name + '">' + arguments[1].trim() + '</div>';
+        //
+        // Maintaining fold's open or closed state is done as follows:
+        // when fold is initially created, it's given an ID, `fold-<fold-number>`.
+        // During next folding, we check for presence and state of
+        // `fold-<fold-number>` (thanks to the fact that logs are not buffered).
+        // If it's open, we append `open` class to classes of newly created log,
+        // thus maitaining it's state.
+        //
+        var foldId = 'fold-' + (folds++);
+        var previousFold = document.getElementById('fold-' + foldId);
+        var classList = 'fold ' + name;
+
+        if (previousFold && previousFold.classList.contains('open')) {
+          classList += ' open';
+        }
+
+        return '<div class="' + classList + '" id="' + foldId + '">' +
+          arguments[1].trim() + '</div>';
       });
     });
     return log;
