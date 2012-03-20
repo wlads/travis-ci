@@ -34,7 +34,7 @@ GIT
 
 GIT
   remote: git://github.com/travis-ci/travis-core
-  revision: 4831b956bc4d9829688c253287fcb3f7a0fa0b40
+  revision: 4de144dd7968369d6d6884ad18d2645e96888cc3
   ref: magnum
   specs:
     travis-core (0.0.1)
