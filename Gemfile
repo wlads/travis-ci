@@ -4,7 +4,7 @@ source :rubygems
 base ||= 'git://github.com/travis-ci'
 type = base[0, 2] == '..' ? :path : :git
 
-gem 'travis-core',    type => "#{base}/travis-core", :require => 'travis/engine'
+gem 'travis-core',    :git => 'git://github.com/travis-ci/travis-core', :require => 'travis/engine', :branch => 'sven'
 gem 'travis-support', type => "#{base}/travis-support"
 
 gem 'rails',                '~> 3.2.1'
