@@ -43,8 +43,7 @@ GIT
 
 GIT
   remote: git://github.com/travis-ci/travis-core
-  revision: 8222c8c88a534b390ed767dde85caca1ca45ae01
-  branch: sven
+  revision: 6bb867e5cff47d5adbc559157cec262a2acda2dd
   specs:
     travis-core (0.0.1)
       actionmailer (~> 3.2.1)
@@ -67,7 +66,6 @@ GIT
 GIT
   remote: git://github.com/travis-ci/travis-support
   revision: 6023cb08b40d334804c06702293e7c74e0adf4d4
-  branch: sven
   specs:
     travis-support (0.0.1)
 
@@ -335,7 +333,7 @@ GEM
       polyglot
       polyglot (>= 0.3.1)
     tzinfo (0.3.32)
-    uglifier (1.2.3)
+    uglifier (1.2.4)
       execjs (>= 0.3.0)
       multi_json (>= 1.0.2)
     unicorn (4.1.1)
