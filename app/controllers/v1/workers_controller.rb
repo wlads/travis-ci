@@ -6,13 +6,7 @@ module V1
     respond_to :json
 
     def index
-      respond_with workers
+      respond_with service(:workers).find_all
     end
-
-    protected
-
-      def workers
-        @workers ||= Worker.order(:host, :name)
-      end
   end
 end

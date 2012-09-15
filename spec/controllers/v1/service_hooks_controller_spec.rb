@@ -44,15 +44,7 @@ describe V1::ServiceHooksController do
     end
 
     context 'subscribes to a service hook' do
-      it 'creates a repository if it does not exist' do
-        GH.expects(:post).with(hooks_url, update_payload(true)).returns(active)
-        put :update, :id => 'svenfuchs:minimal', :name => 'minimal', :owner_name => 'svenfuchs', :active => 'true'
-
-        Repository.count.should == 1
-        Repository.first.active?.should be_true
-      end
-
-      it 'updates an existing repository if it exists' do
+      it 'updates the repository' do
         GH.stubs(:[]).with(hooks_url).returns([inactive])
         GH.expects(:patch).with(hook_url, update_payload(true)).returns(active)
         put :update, :id => 'svenfuchs:minimal', :name => 'minimal', :owner_name => 'svenfuchs', :active => 'true'

@@ -1,5 +1,5 @@
 require 'travis'
 
-[:repositories, :builds, :jobs].each do |key|
-  Travis.services[key] = Travis::Services.const_get(key.to_s.camelize)
+Travis::Services.constants.each do |name|
+  Travis.services[name.to_s.underscore.to_sym] = Travis::Services.const_get(name) unless name == :Base
 end

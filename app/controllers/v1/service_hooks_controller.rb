@@ -10,22 +10,12 @@ module V1
     respond_to :json
 
     def index
-      respond_with(service_hooks)
+      respond_with service(:hooks).find_all(params)
     end
 
     def update
-      repository.service_hook.set(params[:active] == 'true', current_user)
-      respond_with(repository)
+      params.delete(:id) # TODO make sure the client uses a proper id
+      respond_with service(:hooks).update(params)
     end
-
-    private
-
-      def service_hooks
-        @service_hooks ||= current_user.service_hooks(:owner_name => params[:owner_name])
-      end
-
-      def repository
-        @repository ||= service(:repositories).find_or_create_by(params.slice(:owner_name, :name))
-      end
   end
 end
